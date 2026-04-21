@@ -306,6 +306,27 @@ export const CLIENT_BRANDS = [
   "Lily Ann Cabinets"
 ];
 
+export const BRAND_IMAGE_MAP: Record<string, string> = {
+  "Nappa Dori": "/images/mobile-img/nappadori.png",
+  "Swiss Beauty": "/images/mobile-img/swissbeauty.png",
+  "Shivan & Narresh": "/images/mobile-img/shivanandnarresh.png",
+  "Outhouse Jewellery": "/images/mobile-img/outhouse.png",
+  "Orange Tree": "/images/mobile-img/orangetree.png",
+  "Perona": "/images/mobile-img/perona.png",
+  "Manan Design": "/images/mobile-img/manan.png",
+  "Jan & April": "/images/mobile-img/janandapril.png",
+  "Cord Studio": "/images/mobile-img/cordstudio.png",
+  "Artisan Lab": "/images/mobile-img/artisanlab.png",
+  "Janavi": "/images/mobile-img/janavi.png",
+  "Chashma": "/images/mobile-img/chashma.png",
+  "OnCloud9": "/images/mobile-img/cloud9.png",
+  "Lily Ann Cabinets": "/images/mobile-img/lilyanncabinets.png",
+  "Transform Health": "/images/mobile-img/transformhealth.png",
+  "Shaz & Kiks": "/images/mobile-img/shazkiks.png",
+  "Ava Cabinetry": "/images/mobile-img/avacabinetry.png",
+  "Idus": "/images/mobile-img/idus.png",
+};
+
 export const NAV_LINKS = [
   { label: "Work", href: "/work" },
   { label: "Process", href: "/process" },
