@@ -8,7 +8,7 @@ import { initialContactFormState } from '@/app/contact/types'
 import { DURATION, EASING } from '@/lib/animation-config'
 
 const CONTACT_EMAIL = 'vishal@pixelforge.in'
-const WHATSAPP_LINK = 'https://wa.me/919999999999'
+const WHATSAPP_LINK = 'https://wa.me/917011551755'
 const SERVICE_OPTIONS = [
   'Shopify Storefront',
   'Next.js Web App',
