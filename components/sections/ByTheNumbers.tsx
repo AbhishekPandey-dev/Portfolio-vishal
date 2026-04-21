@@ -23,7 +23,7 @@ function StatItem({
 }) {
   const displayValue = useCounter({
     target: value,
-    duration: 2000,
+    duration: 1500,
     trigger: isInView,
     decimals: value % 1 !== 0 ? 1 : 0,
   });
@@ -56,7 +56,7 @@ function StatItem({
 
 export function ByTheNumbers() {
   const { ref, hasBeenInView } = useInViewport<HTMLElement>({
-    threshold: 0.2,
+    threshold: 0.02,
     once: true,
   });
 
@@ -96,9 +96,9 @@ export function ByTheNumbers() {
                 : { opacity: 0, x: 60 }
             }
             transition={{
-              duration: DURATION.entrance,
+              duration: DURATION.normal,
               ease: EASING.expoOut,
-              delay: 0.3,
+              delay: 0,
             }}
             className="w-full lg:w-1/2"
           >

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useGSAP } from "@gsap/react";
 import { gsap, ScrollTrigger } from "@/lib/gsap";
+import { EASING } from "@/lib/animation-config";
 
 if (typeof window !== "undefined") {
   // Safe registration, mostly handled by lib/gsap but good for useGSAP
@@ -411,45 +412,25 @@ export function FeaturedWork() {
   const listRef = useRef<HTMLDivElement>(null); // scrollable card list
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
 
-  // ── Native smooth scroll intersection (replaces GSAP scroll hacking) ──────────────────
-  useEffect(() => {
-    let tick = false;
+  // ── GSAP ScrollTrigger for High-Performance Synchronization ──────────────────
+  useGSAP(() => {
+    // Refresh ScrollTrigger to ensure accurate positioning after layout
+    ScrollTrigger.refresh();
 
-    const handleScroll = () => {
-      if (!tick) {
-        requestAnimationFrame(() => {
-          let closestIdx = activeIndex;
-          let minDistance = Infinity;
-          // Focus point: Middle of the screen (or slightly above for lists)
-          const focusY = window.innerHeight * 0.4;
+    cardRefs.current.forEach((card, i) => {
+      if (!card) return;
 
-          cardRefs.current.forEach((card, i) => {
-            if (!card) return;
-            const rect = card.getBoundingClientRect();
-            const cardCenter = rect.top + rect.height / 2;
-            const distance = Math.abs(cardCenter - focusY);
-
-            if (distance < minDistance) {
-              minDistance = distance;
-              closestIdx = i;
-            }
-          });
-
-          if (closestIdx !== activeIndex) {
-            setActiveIndex(closestIdx);
-          }
-          tick = false;
-        });
-        tick = true;
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    // Call once immediately to set initial index if reloading halfway down page
-    handleScroll();
-
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [activeIndex]);
+      ScrollTrigger.create({
+        trigger: card,
+        // Trigger slightly earlier (60% from top) to solve the "highlight later on" issue
+        start: "top 60%",
+        end: "bottom 60%",
+        onEnter: () => setActiveIndex(i),
+        onEnterBack: () => setActiveIndex(i),
+        // Optional: onUpdate for even more granular tracking if needed
+      });
+    });
+  }, { scope: wrapperRef, dependencies: [] });
 
   // ── Click: jump page natively to the chosen card ────────────────────────
   const handleCardClick = useCallback((idx: number) => {
@@ -531,7 +512,7 @@ export function FeaturedWork() {
               initial={{ opacity: 0, scale: 1.03 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.97 }}
-              transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 0.45, ease: EASING.expoOut }}
             >
               <BackgroundMedia project={active} />
 
@@ -579,7 +560,7 @@ export function FeaturedWork() {
                 initial={{ opacity: 0, y: 28 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -16 }}
-                transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ duration: 0.4, ease: EASING.expoOut }}
               >
                 {/* Category badges */}
                 <div className="flex flex-wrap gap-2 justify-end mb-4">
@@ -649,7 +630,7 @@ export function FeaturedWork() {
                 <motion.div
                   className="absolute left-0 top-0 h-full bg-[#00D9FF]"
                   animate={{ width: `${progressPct}%` }}
-                  transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{ duration: 0.4, ease: EASING.expoOut }}
                 />
               </div>
               <div className="flex items-center justify-between mt-2">
