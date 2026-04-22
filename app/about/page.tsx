@@ -39,10 +39,43 @@ const CAREER_TIMELINE = [
   },
 ];
 
-const TECH_ICONS = [
-  "JAVASCRIPT.png", "TYPESCRIPT.png", "REACT.png", "NODE JS.png", 
-  "MONGO DB.png", "TAILWIND.png", "GIT.png", "GITHUB.png",
-  "HTML5.png", "PHP.png", "PYTHON.png", "WORDPRESS.png", "SHOPIFY.png"
+const TECH_CATEGORIES = [
+  {
+    category: "Frontend",
+    items: [
+      { name: "JavaScript", icon: "JAVASCRIPT.png" },
+      { name: "TypeScript", icon: "TYPESCRIPT.png" },
+      { name: "React", icon: "REACT.png" },
+      { name: "Tailwind CSS", icon: "TAILWIND.png" },
+      { name: "HTML5", icon: "HTML5.png" },
+    ]
+  },
+  {
+    category: "Backend",
+    items: [
+      { name: "Node.js", icon: "NODE JS.png" },
+      { name: "PHP", icon: "PHP.png" },
+      { name: "Python", icon: "PYTHON.png" },
+    ]
+  },
+  {
+    category: "Database",
+    items: [
+      { name: "MongoDB", icon: "MONGO DB.png" },
+      { name: "Redis", icon: "REDIS.png" },
+      { name: "Firebase", icon: "FIREBASE.png" },
+    ]
+  },
+  {
+    category: "Tools",
+    items: [
+      { name: "Git", icon: "GIT.png" },
+      { name: "GitHub", icon: "GITHUB.png" },
+      { name: "NPM", icon: "NPM.png" },
+      { name: "WordPress", icon: "WORDPRESS.png" },
+      { name: "Shopify", icon: "SHOPIFY.png" },
+    ]
+  }
 ];
 
 export default function AboutPage() {
@@ -116,35 +149,47 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Tech Arsenal Grid */}
-      <section className="py-32 px-8 max-w-7xl mx-auto">
-        <SectionLabel>Tech Arsenal</SectionLabel>
+      {/* Tech Arsenal Categorized List */}
+      <section className="py-32 w-full border-t border-white/10">
+        <div className="px-8 max-w-7xl mx-auto mb-20">
+          <SectionLabel>Tech Arsenal</SectionLabel>
+        </div>
         
-        <div className="mt-20 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-px bg-white/10 border border-white/10">
-          {TECH_ICONS.map((icon, idx) => {
-            const name = icon.replace(".png", "").replace("-", " ");
-            return (
-              <motion.div 
-                key={icon}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: idx * 0.05 }}
-                className="aspect-square bg-[#0A0A0A] flex flex-col items-center justify-center p-8 group relative overflow-hidden"
-              >
-                <Magnetic>
-                  <img 
-                    src={`/assets/tech-icons/${icon}`} 
-                    alt={name}
-                    className="w-16 h-16 md:w-20 md:h-20 object-contain opacity-20 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500 ease-out" 
-                  />
-                </Magnetic>
-                <span className="absolute bottom-4 font-headline text-[10px] uppercase tracking-[0.2em] opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-500">
-                  {name}
-                </span>
-              </motion.div>
-            );
-          })}
+        <div className="flex flex-col w-full">
+          {TECH_CATEGORIES.map((category, idx) => (
+            <motion.div 
+              key={category.category}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-10%" }}
+              transition={{ duration: 0.6, delay: idx * 0.1 }}
+              className="group border-t border-white/10 flex flex-col md:flex-row gap-12 md:gap-16 lg:gap-32 py-16 px-8 hover:bg-white/[0.02] transition-colors duration-500"
+            >
+              <div className="md:w-1/3">
+                <h3 className="font-headline text-6xl md:text-7xl lg:text-8xl font-black text-white/20 uppercase tracking-tighter break-all md:break-normal group-hover:text-white/40 transition-colors duration-500">
+                  {category.category}
+                </h3>
+              </div>
+              
+              <div className="md:w-2/3 flex flex-wrap gap-x-8 gap-y-10 items-center">
+                {category.items.map(item => (
+                  <Magnetic key={item.name}>
+                    <div className="flex items-center gap-4 cursor-pointer opacity-50 hover:opacity-100 transition-opacity duration-300">
+                      <img 
+                        src={`/assets/tech-icons/${item.icon}`} 
+                        alt={item.name}
+                        className="w-10 h-10 md:w-12 md:h-12 object-contain" 
+                      />
+                      <span className="font-headline text-xs md:text-sm font-bold tracking-[0.15em] uppercase">
+                        {item.name}
+                      </span>
+                    </div>
+                  </Magnetic>
+                ))}
+              </div>
+            </motion.div>
+          ))}
+          <div className="border-t border-white/10 w-full" />
         </div>
       </section>
 
