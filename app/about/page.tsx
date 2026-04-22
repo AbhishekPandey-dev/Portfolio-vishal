@@ -222,7 +222,7 @@ export default function AboutPage() {
                 <div className="hidden md:block h-px w-0 group-hover:w-full bg-vs-outline/20 transition-all duration-1000 mt-12" />
               </div>
               
-              <div className="md:w-[60%] grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-8 md:gap-x-12 gap-y-12 md:gap-y-16 items-center content-center">
+              <div className="md:w-[60%] grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-10 md:gap-x-14 gap-y-14 md:gap-y-20 items-center content-center">
                 {category.items.map((item, i) => (
                   <Magnetic key={item.name}>
                     <motion.div 
@@ -237,7 +237,7 @@ export default function AboutPage() {
                         <img 
                           src={`/assets/tech-icons/${item.icon}`} 
                           alt={item.name}
-                          className="w-12 h-12 md:w-16 md:h-16 lg:w-20 lg:h-20 object-contain grayscale group-hover/icon:grayscale-0 transition-all duration-500" 
+                          className="w-14 h-14 md:w-20 md:h-20 lg:w-24 lg:h-24 object-contain grayscale group-hover/icon:grayscale-0 transition-all duration-500" 
                         />
                         <div className="absolute -inset-4 bg-vs-accent/10 rounded-full blur-2xl opacity-0 group-hover/icon:opacity-100 transition-opacity -z-10" />
                       </div>
