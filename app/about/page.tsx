@@ -126,28 +126,20 @@ export default function AboutPage() {
           
           <div className="relative">
             <RevealText className="mb-[-2vw]">
-              <h1 className="font-display text-[15vw] md:text-[13vw] font-black leading-[0.75] tracking-tight uppercase flex flex-col">
+              <h1 className="font-display text-[15vw] md:text-[13vw] font-black leading-[0.85] tracking-[0.04em] uppercase flex flex-col">
                 <span className="block">Architecting</span>
               </h1>
             </RevealText>
             <RevealText delay={0.1}>
-              <h1 className="font-display text-[15vw] md:text-[13vw] font-black leading-[0.75] tracking-tight uppercase text-vs-background text-stroke italic pl-[5vw]">
+              <h1 className="font-display text-[15vw] md:text-[13vw] font-black leading-[0.85] tracking-[0.04em] uppercase text-vs-background text-stroke italic pl-[5vw]">
                 Digital Reality
               </h1>
             </RevealText>
-
-            {/* Decorative technical specs */}
-            <div className="absolute top-0 right-0 hidden lg:block text-right font-mono text-[10px] text-vs-text-secondary opacity-30 leading-relaxed uppercase tracking-widest">
-              STATUS: STABLE<br />
-              COORDINATES: 28.6139° N, 77.2090° E<br />
-              TIMESTAMP: {new Date().toISOString().split('T')[0]}<br />
-              BUILD: 0x2A9B
-            </div>
           </div>
 
-          <div className="mt-24 md:mt-40 max-w-3xl ml-auto">
-            <RevealText delay={0.4}>
-              <p className="font-headline text-2xl md:text-4xl lg:text-5xl font-light leading-[1.1] text-vs-text-secondary">
+          <div className="mt-20 md:mt-32 max-w-3xl ml-auto">
+            <RevealText delay={0.3}>
+              <p className="font-headline text-2xl md:text-4xl lg:text-5xl font-light leading-[1.2] text-vs-text-secondary">
                 I am a full stack developer & UI/UX designer. I build experiences that exist at the <span className="text-vs-foreground italic">collision point</span> of raw performance and editorial design.
               </p>
             </RevealText>
@@ -170,19 +162,19 @@ export default function AboutPage() {
         
         <div className="flex flex-col w-full border-t border-vs-outline/20">
           {CAREER_TIMELINE.map((item, idx) => (
-            <motion.div 
+              <motion.div 
               key={idx}
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-10%" }}
-              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: idx * 0.05 }}
-              className="group relative border-b border-vs-outline/20 flex flex-col lg:flex-row lg:items-center justify-between py-16 px-6 md:px-12 lg:px-24 hover:bg-vs-foreground hover:text-vs-background transition-colors duration-700 cursor-none"
+              transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: idx * 0.1 }}
+              className="group relative border-b border-vs-outline/20 flex flex-col lg:flex-row lg:items-center justify-between py-20 px-6 md:px-12 lg:px-24 hover:bg-vs-foreground hover:text-vs-background transition-colors duration-500 cursor-none"
             >
               <div className="flex-1 text-xs md:text-sm font-headline tracking-[0.3em] uppercase opacity-40 group-hover:opacity-100 transition-opacity mb-4 lg:mb-0">
                 {item.period}
               </div>
               
-              <div className="flex-[2] font-display text-7xl md:text-8xl lg:text-[10rem] font-black uppercase tracking-tighter mb-8 lg:mb-0 leading-[0.8]">
+              <div className="flex-[2] font-display text-7xl md:text-8xl lg:text-[10rem] font-black uppercase tracking-[0.02em] mb-8 lg:mb-0 leading-[0.85]">
                 {item.company}
               </div>
               
@@ -223,19 +215,23 @@ export default function AboutPage() {
                   <div className="font-mono text-[10px] text-vs-accent mb-4 opacity-0 group-hover:opacity-100 transition-opacity">
                     {category.id}
                   </div>
-                  <h3 className="font-display text-8xl md:text-9xl lg:text-[12rem] font-black text-vs-outline/30 uppercase tracking-tighter break-all md:break-normal group-hover:text-vs-foreground transition-all duration-700 leading-[0.75] group-hover:scale-[1.02] origin-left">
+                  <h3 className="font-display text-[15vw] md:text-9xl lg:text-[12rem] font-black text-vs-outline/20 uppercase tracking-[0.02em] md:break-normal group-hover:text-vs-foreground transition-all duration-700 leading-[0.85] group-hover:scale-[1.02] origin-left">
                     {category.category}
                   </h3>
                 </div>
                 <div className="hidden md:block h-px w-0 group-hover:w-full bg-vs-outline/20 transition-all duration-1000 mt-12" />
               </div>
               
-              <div className="md:w-[60%] flex flex-wrap gap-x-12 md:gap-x-16 gap-y-12 md:gap-y-20 items-center content-center">
+              <div className="md:w-[60%] grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-8 md:gap-x-12 gap-y-12 md:gap-y-16 items-center content-center">
                 {category.items.map((item, i) => (
                   <Magnetic key={item.name}>
                     <motion.div 
-                      whileHover={{ scale: 1.1 }}
-                      className="flex flex-col items-center gap-6 cursor-pointer opacity-40 hover:opacity-100 transition-all duration-500 group/icon"
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      whileInView={{ opacity: 0.4, scale: 1 }}
+                      whileHover={{ scale: 1.1, opacity: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.5, delay: i * 0.05 }}
+                      className="flex flex-col items-center gap-6 cursor-pointer transition-all duration-500 group/icon"
                     >
                       <div className="relative">
                         <img 
