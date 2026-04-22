@@ -64,7 +64,7 @@ export function Footer() {
             href="/" 
             className="text-white/70 hover:text-white transition-all duration-300 hover:scale-105 active:scale-95"
           >
-            VISHAL_SINGH
+            VISHAL SINGH
           </Link>
         </div>
 
@@ -138,8 +138,8 @@ export function Footer() {
         className="relative z-10 w-full flex flex-col md:flex-row justify-between items-start md:items-end text-[10px] md:text-11px tracking-[0.2em] gap-6 md:gap-4"
       >
         <div className="flex flex-col gap-2 md:gap-1 text-left">
-          <span className="text-white/40">DESIGNED BY _ABHISHEK_PANDEY</span>
-          <span className="text-white/40">DEVELOPED BY _ABHISHEK_PANDEY_&_VSHAL_SINGH</span>
+          <span className="text-white/40">DESIGNED BY ABHISHEK PANDEY</span>
+          <span className="text-white/40">DEVELOPED BY ABHISHEK PANDEY & VSHAL SINGH WITH &lt;/LOVE &gt;</span>
         </div>
 
         <div className="text-left md:text-right">
