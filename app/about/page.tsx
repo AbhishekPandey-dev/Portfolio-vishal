@@ -98,7 +98,35 @@ export default function AboutPage() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Custom GSAP animations can go here if needed for more complex sequences
+      // Liquid Smooth Scroll Skew Effect
+      const items = containerRef.current?.querySelectorAll(".group");
+      if (!items || items.length === 0) return;
+
+      let proxy = { skew: 0 };
+      let skewSetter = gsap.quickSetter(items, "skewY", "deg");
+      let clamp = gsap.utils.clamp(-2, 2);
+
+      gsap.registerPlugin(gsap.utils.toArray("ScrollTrigger") ? [] : []); // Ensure ScrollTrigger is ready if used
+
+      import("gsap/ScrollTrigger").then(({ ScrollTrigger }) => {
+        gsap.registerPlugin(ScrollTrigger);
+        
+        ScrollTrigger.create({
+          onUpdate: (self) => {
+            let skew = clamp(self.getVelocity() / -500);
+            if (Math.abs(skew) > Math.abs(proxy.skew)) {
+              proxy.skew = skew;
+              gsap.to(proxy, {
+                skew: 0,
+                duration: 0.8,
+                ease: "power3",
+                overwrite: true,
+                onUpdate: () => skewSetter(proxy.skew)
+              });
+            }
+          }
+        });
+      });
     });
     return () => ctx.revert();
   }, []);
@@ -106,6 +134,21 @@ export default function AboutPage() {
   return (
     <div ref={containerRef} className="bg-vs-background text-vs-foreground min-h-screen relative selection:bg-vs-accent selection:text-black">
       
+      {/* Page Transition Curtain */}
+      <motion.div
+        initial={{ y: 0 }}
+        animate={{ y: "-100%" }}
+        transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+        className="fixed inset-0 bg-vs-accent z-[1000] pointer-events-none origin-bottom"
+      />
+
+      {/* Subtle Bottom Curtain for Exit or Layering */}
+      <motion.div
+        initial={{ scaleY: 1 }}
+        animate={{ scaleY: 0 }}
+        transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
+        className="fixed inset-0 bg-vs-foreground z-[999] pointer-events-none origin-top"
+      />
       {/* Noise Texture Overlay */}
       <div className="fixed inset-0 pointer-events-none opacity-[0.03] z-[999] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
 
@@ -114,6 +157,9 @@ export default function AboutPage() {
         <motion.div 
           style={{ y: heroY, opacity: heroOpacity, scale: heroScale }}
           className="max-w-[100rem] mx-auto w-full pt-32 pb-20"
+          initial={{ y: 100, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 0.4 }}
         >
           <div className="flex items-center gap-4 mb-12 overflow-hidden">
             <motion.div 
@@ -174,9 +220,12 @@ export default function AboutPage() {
                 {item.period}
               </div>
               
-              <div className="flex-[2] font-display text-7xl md:text-8xl lg:text-[10rem] font-black uppercase tracking-[0.02em] mb-8 lg:mb-0 leading-[0.85]">
+              <motion.div 
+                style={{ skewY: useTransform(scrollYProgress, [0, 1], [0, 2]) }}
+                className="flex-[2] font-display text-7xl md:text-8xl lg:text-[10rem] font-black uppercase tracking-[0.02em] mb-8 lg:mb-0 leading-[0.85]"
+              >
                 {item.company}
-              </div>
+              </motion.div>
               
               <div className="flex-1 flex flex-col gap-4 lg:text-right">
                 <span className="font-headline text-xl md:text-3xl uppercase tracking-tighter font-bold text-vs-accent group-hover:text-vs-background transition-colors">{item.role}</span>
