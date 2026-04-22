@@ -139,7 +139,7 @@ export function Footer() {
       >
         <div className="flex flex-col gap-2 md:gap-1 text-left">
           <span className="text-white/40">DESIGNED BY ABHISHEK PANDEY</span>
-          <span className="text-white/40">DEVELOPED BY ABHISHEK PANDEY & VSHAL SINGH WITH &lt;/LOVE &lt;</span>
+          <span className="text-white/40">DEVELOPED BY ABHISHEK PANDEY & VSHAL SINGH WITH &lt;/LOVE &gt;</span>
         </div>
 
         <div className="text-left md:text-right">
