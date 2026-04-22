@@ -1,47 +1,49 @@
 "use client";
 
-import { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { useRef, useEffect } from "react";
+import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import { RevealText } from "@/components/ui/RevealText";
 import { SectionLabel } from "@/components/ui/SectionLabel";
 import { Magnetic } from "@/components/ui/Magnetic";
+import { gsap } from "@/lib/gsap";
 
 const CAREER_TIMELINE = [
   { 
     company: "Pixelforge", 
     role: "Full Stack Developer", 
     period: "2023 — Present",
-    description: "Leading architectural decisions and building high-impact digital products."
+    description: "Leading architectural decisions and building high-impact digital products for the next generation of the web."
   },
   { 
     company: "Digitaltek", 
     role: "Software Engineer", 
     period: "2022 — 2023",
-    description: "Focused on scalable backend systems and modern frontend performance."
+    description: "Focused on scalable backend systems and modern frontend performance optimization at scale."
   },
   { 
     company: "The Loom", 
     role: "Full Stack Developer", 
     period: "2021 — 2022",
-    description: "Crafting editorial digital experiences for premium brands."
+    description: "Crafting editorial digital experiences for premium brands with a focus on motion and interaction."
   },
   { 
     company: "Commerce Pundit", 
     role: "Web Developer", 
     period: "2020 — 2021",
-    description: "Specialized in high-conversion e-commerce solutions."
+    description: "Specialized in high-conversion e-commerce solutions and enterprise-grade web applications."
   },
   { 
     company: "Digital Impression", 
     role: "Junior Web Developer", 
     period: "2019 — 2020",
-    description: "Started the journey focusing on interactive web designs."
+    description: "Started the journey focusing on interactive web designs and frontend fundamentals."
   },
 ];
 
 const TECH_CATEGORIES = [
   {
     category: "Frontend",
+    id: "FRONT-01",
     items: [
       { name: "JavaScript", icon: "JAVASCRIPT.png" },
       { name: "TypeScript", icon: "TYPESCRIPT.png" },
@@ -52,6 +54,7 @@ const TECH_CATEGORIES = [
   },
   {
     category: "Backend",
+    id: "BACK-02",
     items: [
       { name: "Node.js", icon: "NODE JS.png" },
       { name: "PHP", icon: "PHP.png" },
@@ -60,6 +63,7 @@ const TECH_CATEGORIES = [
   },
   {
     category: "Database",
+    id: "DATA-03",
     items: [
       { name: "MongoDB", icon: "MONGO DB.png" },
       { name: "Redis", icon: "REDIS.png" },
@@ -68,6 +72,7 @@ const TECH_CATEGORIES = [
   },
   {
     category: "Tools",
+    id: "TOOL-04",
     items: [
       { name: "Git", icon: "GIT.png" },
       { name: "GitHub", icon: "GITHUB.png" },
@@ -80,69 +85,117 @@ const TECH_CATEGORIES = [
 
 export default function AboutPage() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const heroTextRef = useRef<HTMLDivElement>(null);
+
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end end"]
   });
 
-  return (
-    <div ref={containerRef} className="bg-[#0A0A0A] text-white min-h-screen selection:bg-white selection:text-[#0A0A0A]">
-      
-      {/* Hero / Manifesto Section */}
-      <section className="pt-48 pb-32 px-8 flex flex-col justify-center max-w-7xl mx-auto">
-        <SectionLabel>The Manifesto</SectionLabel>
-        
-        <div className="mt-12 flex flex-col gap-6">
-          <RevealText>
-            <h1 className="font-headline text-5xl md:text-8xl lg:text-[9rem] font-black leading-[0.85] tracking-tighter uppercase">
-              Architecting
-            </h1>
-          </RevealText>
-          <RevealText>
-            <h1 className="font-headline text-5xl md:text-8xl lg:text-[9rem] font-black leading-[0.85] tracking-tighter uppercase text-white/20 italic">
-              Digital Reality
-            </h1>
-          </RevealText>
-        </div>
+  const heroY = useTransform(scrollYProgress, [0, 0.2], [0, -100]);
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.15], [1, 0]);
+  const heroScale = useTransform(scrollYProgress, [0, 0.2], [1, 0.95]);
 
-        <div className="mt-24 md:mt-32 max-w-3xl ml-auto">
-          <RevealText>
-            <p className="font-headline text-2xl md:text-4xl font-light leading-tight text-white/80">
-              I am a full stack developer & UI/UX designer. I build experiences that exist at the collision point of raw, uncompromising performance and high-end editorial design.
-            </p>
-          </RevealText>
-        </div>
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      // Custom GSAP animations can go here if needed for more complex sequences
+    });
+    return () => ctx.revert();
+  }, []);
+
+  return (
+    <div ref={containerRef} className="bg-vs-background text-vs-foreground min-h-screen relative selection:bg-vs-accent selection:text-black">
+      
+      {/* Noise Texture Overlay */}
+      <div className="fixed inset-0 pointer-events-none opacity-[0.03] z-[999] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
+
+      {/* Hero / Manifesto Section */}
+      <section className="relative min-h-[90vh] flex flex-col justify-center px-6 md:px-12 lg:px-24 overflow-hidden">
+        <motion.div 
+          style={{ y: heroY, opacity: heroOpacity, scale: heroScale }}
+          className="max-w-[100rem] mx-auto w-full pt-32 pb-20"
+        >
+          <div className="flex items-center gap-4 mb-12 overflow-hidden">
+            <motion.div 
+              initial={{ width: 0 }}
+              whileInView={{ width: "40px" }}
+              className="h-px bg-vs-accent"
+            />
+            <SectionLabel className="m-0 text-vs-accent tracking-[0.4em]">MANIFESTO_v2.5</SectionLabel>
+          </div>
+          
+          <div className="relative">
+            <RevealText className="mb-[-2vw]">
+              <h1 className="font-display text-[15vw] md:text-[13vw] font-black leading-[0.75] tracking-tight uppercase flex flex-col">
+                <span className="block">Architecting</span>
+              </h1>
+            </RevealText>
+            <RevealText delay={0.1}>
+              <h1 className="font-display text-[15vw] md:text-[13vw] font-black leading-[0.75] tracking-tight uppercase text-vs-background text-stroke italic pl-[5vw]">
+                Digital Reality
+              </h1>
+            </RevealText>
+
+            {/* Decorative technical specs */}
+            <div className="absolute top-0 right-0 hidden lg:block text-right font-mono text-[10px] text-vs-text-secondary opacity-30 leading-relaxed uppercase tracking-widest">
+              STATUS: STABLE<br />
+              COORDINATES: 28.6139° N, 77.2090° E<br />
+              TIMESTAMP: {new Date().toISOString().split('T')[0]}<br />
+              BUILD: 0x2A9B
+            </div>
+          </div>
+
+          <div className="mt-24 md:mt-40 max-w-3xl ml-auto">
+            <RevealText delay={0.4}>
+              <p className="font-headline text-2xl md:text-4xl lg:text-5xl font-light leading-[1.1] text-vs-text-secondary">
+                I am a full stack developer & UI/UX designer. I build experiences that exist at the <span className="text-vs-foreground italic">collision point</span> of raw performance and editorial design.
+              </p>
+            </RevealText>
+          </div>
+        </motion.div>
+
+        {/* Floating background elements */}
+        <div className="absolute top-1/4 -right-20 w-96 h-96 bg-vs-accent/5 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-1/4 -left-20 w-80 h-80 bg-vs-accent/5 rounded-full blur-[100px] pointer-events-none" />
       </section>
 
       {/* Brutalist Career Chronicle */}
-      <section className="py-32 w-full border-t border-white/10">
-        <div className="px-8 max-w-7xl mx-auto mb-20">
-          <SectionLabel>Experience</SectionLabel>
+      <section className="py-32 w-full border-t border-vs-outline/20">
+        <div className="px-6 md:px-12 lg:px-24 max-w-[100rem] mx-auto mb-20 flex items-end justify-between">
+          <SectionLabel>EXPERIENCE_CHRONICLE</SectionLabel>
+          <div className="hidden md:block font-mono text-[10px] opacity-30 tracking-[0.3em] uppercase">
+            SCROLL_TO_EXPLORE_HISTORY
+          </div>
         </div>
         
-        <div className="flex flex-col w-full border-t border-white/10">
+        <div className="flex flex-col w-full border-t border-vs-outline/20">
           {CAREER_TIMELINE.map((item, idx) => (
             <motion.div 
               key={idx}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true, margin: "-10%" }}
-              transition={{ duration: 0.6, delay: idx * 0.1 }}
-              className="group relative border-b border-white/10 flex flex-col lg:flex-row lg:items-center justify-between py-16 px-8 hover:bg-white hover:text-[#0A0A0A] transition-colors duration-500 cursor-default"
+              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: idx * 0.05 }}
+              className="group relative border-b border-vs-outline/20 flex flex-col lg:flex-row lg:items-center justify-between py-16 px-6 md:px-12 lg:px-24 hover:bg-vs-foreground hover:text-vs-background transition-colors duration-700 cursor-none"
             >
-              <div className="flex-1 text-sm md:text-xl font-headline tracking-widest uppercase opacity-40 group-hover:opacity-80 transition-opacity mb-4 lg:mb-0">
+              <div className="flex-1 text-xs md:text-sm font-headline tracking-[0.3em] uppercase opacity-40 group-hover:opacity-100 transition-opacity mb-4 lg:mb-0">
                 {item.period}
               </div>
               
-              <div className="flex-[2] font-headline text-5xl md:text-7xl lg:text-8xl font-black uppercase tracking-tighter mb-6 lg:mb-0">
+              <div className="flex-[2] font-display text-7xl md:text-8xl lg:text-[10rem] font-black uppercase tracking-tighter mb-8 lg:mb-0 leading-[0.8]">
                 {item.company}
               </div>
               
-              <div className="flex-1 flex flex-col gap-2 lg:text-right">
-                <span className="font-headline text-xl md:text-2xl uppercase tracking-widest">{item.role}</span>
-                <p className="text-sm md:text-base opacity-40 group-hover:opacity-100 transition-opacity lg:ml-auto max-w-sm">
+              <div className="flex-1 flex flex-col gap-4 lg:text-right">
+                <span className="font-headline text-xl md:text-3xl uppercase tracking-tighter font-bold text-vs-accent group-hover:text-vs-background transition-colors">{item.role}</span>
+                <p className="text-sm md:text-base opacity-40 group-hover:opacity-80 transition-opacity lg:ml-auto max-w-sm leading-relaxed">
                   {item.description}
                 </p>
+              </div>
+
+              {/* Hover custom cursor effect placeholder or detail */}
+              <div className="absolute right-12 bottom-12 opacity-0 group-hover:opacity-100 transition-opacity font-mono text-[10px] uppercase tracking-widest hidden lg:block underline">
+                VIEW_DETAILS
               </div>
             </motion.div>
           ))}
@@ -150,49 +203,64 @@ export default function AboutPage() {
       </section>
 
       {/* Tech Arsenal Categorized List */}
-      <section className="py-32 w-full border-t border-white/10">
-        <div className="px-8 max-w-7xl mx-auto mb-20">
-          <SectionLabel>Tech Arsenal</SectionLabel>
+      <section className="py-32 w-full border-t border-vs-outline/20 bg-vs-surface/30">
+        <div className="px-6 md:px-12 lg:px-24 max-w-[100rem] mx-auto mb-20">
+          <SectionLabel className="text-vs-accent">STACK_INVENTORY</SectionLabel>
         </div>
         
         <div className="flex flex-col w-full">
           {TECH_CATEGORIES.map((category, idx) => (
             <motion.div 
               key={category.category}
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-10%" }}
-              transition={{ duration: 0.6, delay: idx * 0.1 }}
-              className="group border-t border-white/10 flex flex-col md:flex-row gap-12 md:gap-16 lg:gap-32 py-16 px-8 hover:bg-white/[0.02] transition-colors duration-500"
+              transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: idx * 0.1 }}
+              className="group border-t border-vs-outline/20 flex flex-col md:flex-row gap-12 md:gap-24 lg:gap-40 py-20 md:py-32 px-6 md:px-12 lg:px-24 hover:bg-vs-foreground/[0.01] transition-colors duration-1000"
             >
-              <div className="md:w-1/3">
-                <h3 className="font-headline text-6xl md:text-7xl lg:text-8xl font-black text-white/20 uppercase tracking-tighter break-all md:break-normal group-hover:text-white/40 transition-colors duration-500">
-                  {category.category}
-                </h3>
+              <div className="md:w-[40%] flex flex-col justify-between">
+                <div>
+                  <div className="font-mono text-[10px] text-vs-accent mb-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                    {category.id}
+                  </div>
+                  <h3 className="font-display text-8xl md:text-9xl lg:text-[12rem] font-black text-vs-outline/30 uppercase tracking-tighter break-all md:break-normal group-hover:text-vs-foreground transition-all duration-700 leading-[0.75] group-hover:scale-[1.02] origin-left">
+                    {category.category}
+                  </h3>
+                </div>
+                <div className="hidden md:block h-px w-0 group-hover:w-full bg-vs-outline/20 transition-all duration-1000 mt-12" />
               </div>
               
-              <div className="md:w-2/3 flex flex-wrap gap-x-8 gap-y-10 items-center">
-                {category.items.map(item => (
+              <div className="md:w-[60%] flex flex-wrap gap-x-12 md:gap-x-16 gap-y-12 md:gap-y-20 items-center content-center">
+                {category.items.map((item, i) => (
                   <Magnetic key={item.name}>
-                    <div className="flex items-center gap-4 cursor-pointer opacity-50 hover:opacity-100 transition-opacity duration-300">
-                      <img 
-                        src={`/assets/tech-icons/${item.icon}`} 
-                        alt={item.name}
-                        className="w-10 h-10 md:w-12 md:h-12 object-contain" 
-                      />
-                      <span className="font-headline text-xs md:text-sm font-bold tracking-[0.15em] uppercase">
+                    <motion.div 
+                      whileHover={{ scale: 1.1 }}
+                      className="flex flex-col items-center gap-6 cursor-pointer opacity-40 hover:opacity-100 transition-all duration-500 group/icon"
+                    >
+                      <div className="relative">
+                        <img 
+                          src={`/assets/tech-icons/${item.icon}`} 
+                          alt={item.name}
+                          className="w-12 h-12 md:w-16 md:h-16 lg:w-20 lg:h-20 object-contain grayscale group-hover/icon:grayscale-0 transition-all duration-500" 
+                        />
+                        <div className="absolute -inset-4 bg-vs-accent/10 rounded-full blur-2xl opacity-0 group-hover/icon:opacity-100 transition-opacity -z-10" />
+                      </div>
+                      <span className="font-headline text-[10px] md:text-xs font-bold tracking-[0.3em] uppercase text-vs-text-secondary group-hover/icon:text-vs-accent transition-colors">
                         {item.name}
                       </span>
-                    </div>
+                    </motion.div>
                   </Magnetic>
                 ))}
               </div>
             </motion.div>
           ))}
-          <div className="border-t border-white/10 w-full" />
+          <div className="border-t border-vs-outline/20 w-full" />
         </div>
       </section>
 
+      {/* Background decoration */}
+      <div className="absolute top-0 right-0 w-px h-full bg-gradient-to-b from-transparent via-vs-outline/10 to-transparent pointer-events-none" />
+      <div className="absolute top-0 left-[20%] w-px h-full bg-vs-outline/5 pointer-events-none hidden lg:block" />
 
     </div>
   );
