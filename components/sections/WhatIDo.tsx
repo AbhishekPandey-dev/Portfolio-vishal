@@ -2,7 +2,6 @@
 
 import { useRef } from "react";
 import { Network, Activity, Cpu, Layers } from "lucide-react";
-import { SERVICES } from "@/lib/constants";
 import { SectionLabel } from "@/components/ui/SectionLabel";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -18,6 +17,39 @@ const ICON_MAP: Record<string, any> = {
   Cpu,
   Layers,
 };
+
+const PREMIUM_SERVICES = [
+  {
+    icon: "Network",
+    title: "Full-Stack Development",
+    description:
+      "Custom websites and web applications built for performance, scalability, and real-world use.",
+  },
+  {
+    icon: "Activity",
+    title: "UI/UX Design",
+    description:
+      "Clean, user-focused interfaces designed to improve engagement and usability.",
+  },
+  {
+    icon: "Cpu",
+    title: "Shopify Development",
+    description:
+      "Custom Shopify stores and storefront experiences built to support growth.",
+  },
+  {
+    icon: "Layers",
+    title: "WordPress Development",
+    description:
+      "Flexible, easy-to-manage WordPress websites tailored to your brand.",
+  },
+  {
+    icon: "Network",
+    title: "Backend Management",
+    description:
+      "APIs, databases, integrations, and maintenance to keep your platform running smoothly.",
+  },
+] as const;
 
 export function WhatIDo() {
   const container = useRef<HTMLDivElement>(null);
@@ -84,7 +116,7 @@ export function WhatIDo() {
               <span className="opacity-90">results.</span>
             </h2>
             <p className="text-vs-text-secondary text-lg md:text-xl leading-relaxed max-w-md font-body">
-              I engineer digital ecosystems designed for ruthless efficiency. No bloated code. No generic templates. Just high-performance architecture that scales with human intention.
+              I deliver end-to-end digital solutions, from custom websites and web applications to Shopify stores, WordPress platforms, UI/UX design, and dependable backend support.
             </p>
           </div>
 
@@ -93,7 +125,7 @@ export function WhatIDo() {
             {/* Filler space at top so the first item aligns well on large screens */}
             <div className="hidden md:block h-[20vh]"></div>
             
-            {SERVICES.map((service, index) => {
+            {PREMIUM_SERVICES.map((service, index) => {
               const Icon = ICON_MAP[service.icon] || Network;
               return (
                 <div 
