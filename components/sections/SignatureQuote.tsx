@@ -84,7 +84,7 @@ export function SignatureQuote() {
           }}
           className="mt-8 text-vs-text-secondary text-sm md:text-base font-body tracking-wide"
         >
-          Full-stack craftsmanship, from concept to deployment.
+          From concept to code to launch, built with precision and purpose.
         </motion.p>
       </div>
     </section>
