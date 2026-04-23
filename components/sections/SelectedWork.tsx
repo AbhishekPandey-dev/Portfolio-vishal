@@ -25,24 +25,33 @@ export function SelectedWork() {
           <motion.h2
             initial={{ opacity: 0, y: 30 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: DURATION.entrance, ease: EASING.expoOut, delay: 0.1 }}
+            transition={{
+              duration: DURATION.entrance,
+              ease: EASING.expoOut,
+              delay: 0.1,
+            }}
             className="font-headline font-black text-white leading-none tracking-tighter"
             style={{ fontSize: "clamp(3rem, 7vw, 6rem)" }}
           >
-            CRAFTED<br />
-            <span className="text-stroke">WITH INTENT</span>
+            WORK
+            <br />
+            <span className="text-stroke">THAT SPEAKS</span>
           </motion.h2>
         </div>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: DURATION.entrance, ease: EASING.expoOut, delay: 0.3 }}
+          transition={{
+            duration: DURATION.entrance,
+            ease: EASING.expoOut,
+            delay: 0.3,
+          }}
           className="flex flex-col gap-4 max-w-xs"
         >
           <p className="text-vs-text-secondary text-sm leading-relaxed font-body">
-            A curated selection of projects where design, performance, and
-            business impact converge.
+            A showcase of projects designed not just to function, but to truly
+            resonate.
           </p>
           <Link
             href="/work"
@@ -58,7 +67,12 @@ export function SelectedWork() {
               fill="none"
               className="text-white/40 group-hover:text-vs-accent transition-colors duration-300"
             >
-              <path d="M1 11L11 1M11 1H4M11 1V8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="square" />
+              <path
+                d="M1 11L11 1M11 1H4M11 1V8"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="square"
+              />
             </svg>
           </Link>
         </motion.div>
