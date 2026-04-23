@@ -55,42 +55,42 @@ export function WhatIDo() {
   const container = useRef<HTMLDivElement>(null);
 
   useGSAP(() => {
-    const cards = gsap.utils.toArray(".service-card");
+    const cards = gsap.utils.toArray<HTMLElement>(".service-card-container");
     
-    cards.forEach((card: any) => {
-      // Enter from below
+    cards.forEach((cardContainer, index) => {
+      const card = cardContainer.querySelector('.service-card');
+      
+      // Animate the card scaling down when the next card scrolls up
+      if (index < cards.length - 1) {
+        gsap.to(card, {
+          scale: 0.92,
+          opacity: 0.4,
+          y: -10, // Slight upward push
+          scrollTrigger: {
+            trigger: cards[index + 1],
+            start: "top bottom-=100",
+            end: "top 25%",
+            scrub: true,
+          }
+        });
+      }
+      
+      // Initial fade-up entry for the card container
       gsap.fromTo(
-        card,
-        { 
-          opacity: 0.1, 
-          y: 80,
-          scale: 0.95,
-        },
+        cardContainer,
+        { opacity: 0, y: 60 },
         {
           opacity: 1,
           y: 0,
-          scale: 1,
-          ease: "power1.out",
+          duration: 0.8,
+          ease: "power2.out",
           scrollTrigger: {
-            trigger: card,
+            trigger: cardContainer,
             start: "top bottom-=50",
-            end: "center center+=100",
-            scrub: 1,
+            toggleActions: "play none none reverse",
           }
         }
       );
-      
-      // Fade out dynamically as it scrolls up past center
-      gsap.to(card, {
-        opacity: 0.3,
-        scale: 0.95,
-        scrollTrigger: {
-          trigger: card,
-          start: "center top+=200",
-          end: "bottom top",
-          scrub: 1,
-        }
-      });
     });
   }, { scope: container });
 
@@ -121,7 +121,7 @@ export function WhatIDo() {
           </div>
 
           {/* RIGHT: Scrolling Content */}
-          <div className="w-full md:w-7/12 flex flex-col gap-8 md:gap-16 pb-[15vh] md:pb-[30vh]">
+          <div className="w-full md:w-7/12 flex flex-col pb-[15vh] md:pb-[30vh]">
             {/* Filler space at top so the first item aligns well on large screens */}
             <div className="hidden md:block h-[20vh]"></div>
             
@@ -130,37 +130,44 @@ export function WhatIDo() {
               return (
                 <div 
                   key={index} 
-                  className="service-card group relative overflow-hidden rounded-2xl border border-white/[0.06] bg-[#0A0A0A]/50 backdrop-blur-xl p-8 md:p-12 transition-all duration-700 hover:border-vs-accent/40"
+                  className="service-card-container sticky"
+                  style={{ 
+                    top: `calc(15vh + ${index * 30}px)`,
+                    zIndex: index + 1,
+                    marginBottom: index === PREMIUM_SERVICES.length - 1 ? '0' : '20vh'
+                  }}
                 >
-                  {/* Cybernetic overlay / Laser scan */}
-                  <div className="absolute top-0 left-0 w-[2px] h-full bg-gradient-to-b from-transparent via-vs-accent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-                  
-                  {/* Number Indicator */}
-                  <div className="text-vs-accent/60 font-mono text-sm tracking-widest mb-10">
-                    // 0{index + 1}
-                  </div>
-                  
-                  {/* Icon Wrapper */}
-                  <div className="mb-8 inline-flex h-16 w-16 items-center justify-center rounded-xl bg-white/[0.02] border border-white/[0.08] shadow-[0_0_30px_rgba(0,0,0,0.3)] group-hover:bg-vs-accent/10 group-hover:border-vs-accent/30 transition-all duration-500">
-                    <Icon className="w-7 h-7 text-white group-hover:text-vs-accent group-hover:scale-110 transition-all duration-500" strokeWidth={1.5} />
-                  </div>
-                  
-                  {/* Title */}
-                  <h3 className="text-2xl md:text-4xl font-headline font-bold text-white mb-6 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-vs-accent transition-all duration-500">
-                    {service.title}
-                  </h3>
-                  
-                  {/* Description */}
-                  <p className="text-vs-text-secondary text-base lg:text-lg leading-relaxed font-body group-hover:text-white/80 transition-colors duration-500">
-                    {service.description}
-                  </p>
+                  <div className="service-card group relative overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0A0A0A]/95 backdrop-blur-xl p-8 md:p-12 transition-all duration-700 hover:border-vs-accent/40 shadow-[0_-15px_40px_-15px_rgba(0,0,0,0.6)] origin-top">
+                    {/* Cybernetic overlay / Laser scan */}
+                    <div className="absolute top-0 left-0 w-[2px] h-full bg-gradient-to-b from-transparent via-vs-accent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                    
+                    {/* Number Indicator */}
+                    <div className="text-vs-accent/60 font-mono text-sm tracking-widest mb-10">
+                      // 0{index + 1}
+                    </div>
+                    
+                    {/* Icon Wrapper */}
+                    <div className="mb-8 inline-flex h-16 w-16 items-center justify-center rounded-xl bg-white/[0.02] border border-white/[0.08] shadow-[0_0_30px_rgba(0,0,0,0.3)] group-hover:bg-vs-accent/10 group-hover:border-vs-accent/30 transition-all duration-500">
+                      <Icon className="w-7 h-7 text-white group-hover:text-vs-accent group-hover:scale-110 transition-all duration-500" strokeWidth={1.5} />
+                    </div>
+                    
+                    {/* Title */}
+                    <h3 className="text-2xl md:text-4xl font-headline font-bold text-white mb-6 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-vs-accent transition-all duration-500">
+                      {service.title}
+                    </h3>
+                    
+                    {/* Description */}
+                    <p className="text-vs-text-secondary text-base lg:text-lg leading-relaxed font-body group-hover:text-white/80 transition-colors duration-500">
+                      {service.description}
+                    </p>
 
-                  {/* Corner accents (Tech/AI aesthetic) */}
-                  <div className="absolute top-0 right-0 w-12 h-12 border-t border-r border-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-700 flex items-center justify-center">
-                    <span className="w-1 h-1 bg-vs-accent absolute top-2 right-2 rounded-full" />
-                  </div>
-                  <div className="absolute bottom-0 left-0 w-12 h-12 border-b border-l border-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-700 flex items-center justify-center">
-                    <span className="w-1 h-1 bg-vs-accent absolute bottom-2 left-2 rounded-full" />
+                    {/* Corner accents (Tech/AI aesthetic) */}
+                    <div className="absolute top-0 right-0 w-12 h-12 border-t border-r border-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-700 flex items-center justify-center">
+                      <span className="w-1 h-1 bg-vs-accent absolute top-2 right-2 rounded-full" />
+                    </div>
+                    <div className="absolute bottom-0 left-0 w-12 h-12 border-b border-l border-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-700 flex items-center justify-center">
+                      <span className="w-1 h-1 bg-vs-accent absolute bottom-2 left-2 rounded-full" />
+                    </div>
                   </div>
                 </div>
               );
