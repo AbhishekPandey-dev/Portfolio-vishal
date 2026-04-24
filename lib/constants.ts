@@ -5,6 +5,7 @@ export interface ProjectMedia {
   src?: string;
   webm?: string;
   mp4?: string;
+  gif?: string;
   mobileSrc: string;
 }
 
@@ -32,6 +33,7 @@ export const SELECTED_PROJECTS: ProjectData[] = [
       type: "video",
       webm: "/images/swissbeauty.webm",
       mp4: "/images/swissbeauty.mp4",
+      gif: "/images/gif/swissbeauty.gif",
       mobileSrc: "/images/mobile-img/swissbeauty.png",
     },
     description:
@@ -48,6 +50,7 @@ export const SELECTED_PROJECTS: ProjectData[] = [
       type: "video",
       webm: "/images/shivanandnarresh.webm",
       mp4: "/images/shivanandnarresh.mp4",
+      gif: "/images/gif/shivanandnarresh.gif",
       mobileSrc: "/images/mobile-img/shivanandnarresh.png",
     },
     description:
@@ -64,6 +67,7 @@ export const SELECTED_PROJECTS: ProjectData[] = [
       type: "video",
       webm: "/images/outhousejewellery.webm",
       mp4: "/images/outhousejewellery.mp4",
+      gif: "/images/gif/outhouse.gif",
       mobileSrc: "/images/mobile-img/outhouse.png",
     },
     description:
@@ -80,6 +84,7 @@ export const SELECTED_PROJECTS: ProjectData[] = [
       type: "video",
       webm: "/images/cordstudio.webm",
       mp4: "/images/cordstudio.mp4",
+      gif: "/images/gif/cordstudio.gif",
       mobileSrc: "/images/mobile-img/cordstudio.png",
     },
     description:

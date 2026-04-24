@@ -64,20 +64,48 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
               style={{ y: videoY }}
               className="absolute inset-[-8%] w-[116%] h-[116%]"
             >
-              <video
-                autoPlay
-                muted
-                loop
-                playsInline
-                className="w-full h-full object-cover"
-              >
-                {project.media.webm && (
-                  <source src={project.media.webm} type="video/webm" />
-                )}
-                {project.media.mp4 && (
-                  <source src={project.media.mp4} type="video/mp4" />
-                )}
-              </video>
+              {project.media.gif ? (
+                <>
+                  {/* Desktop: High-quality cinematic video */}
+                  <video
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    className="hidden md:block w-full h-full object-cover"
+                  >
+                    {project.media.webm && (
+                      <source src={project.media.webm} type="video/webm" />
+                    )}
+                    {project.media.mp4 && (
+                      <source src={project.media.mp4} type="video/mp4" />
+                    )}
+                  </video>
+
+                  {/* Mobile: Optimized GIF for faster loading and compatibility */}
+                  <img
+                    src={project.media.gif}
+                    alt={`${project.title} showcase`}
+                    className="block md:hidden w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                </>
+              ) : (
+                <video
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  className="w-full h-full object-cover"
+                >
+                  {project.media.webm && (
+                    <source src={project.media.webm} type="video/webm" />
+                  )}
+                  {project.media.mp4 && (
+                    <source src={project.media.mp4} type="video/mp4" />
+                  )}
+                </video>
+              )}
             </motion.div>
 
             {/* Hover reveal overlay */}
