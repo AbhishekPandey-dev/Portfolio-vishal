@@ -171,18 +171,18 @@ export default function AboutPage() {
               whileInView={{ width: "40px" }}
               className="h-px bg-vs-accent"
             />
-            <SectionLabel className="m-0 text-vs-accent tracking-[0.4em]">MANIFESTO_v2.5</SectionLabel>
+            <SectionLabel className="m-0 text-vs-accent tracking-[0.4em]">MANIFESTO</SectionLabel>
           </div>
           
           <div className="relative">
             <RevealText className="mb-[-2vw]">
               <h1 className="font-display text-[15vw] md:text-[13vw] font-black leading-[0.85] tracking-[0.04em] uppercase flex flex-col">
-                <span className="block">Architecting</span>
+                <span className="block">WHERE VISION</span>
               </h1>
             </RevealText>
             <RevealText delay={0.1}>
               <h1 className="font-display text-[15vw] md:text-[13vw] font-black leading-[0.85] tracking-[0.04em] uppercase text-vs-background text-stroke italic pl-[5vw]">
-                Digital Reality
+                TAKES FORM
               </h1>
             </RevealText>
           </div>
@@ -190,7 +190,7 @@ export default function AboutPage() {
           <div className="mt-20 md:mt-32 max-w-3xl ml-auto">
             <RevealText delay={0.3}>
               <p className="font-headline text-2xl md:text-4xl lg:text-5xl font-light leading-[1.2] text-vs-text-secondary">
-                I am a full stack developer & UI/UX designer. I build experiences that exist at the <span className="text-vs-foreground italic">collision point</span> of raw performance and editorial design.
+                I am a full stack developer & UI/UX designer. I build digital spaces that <span className="text-vs-foreground italic">feel as good as they function</span>, blending technical rigor with a <span className="text-vs-foreground italic">human soul</span>.
               </p>
             </RevealText>
           </div>
