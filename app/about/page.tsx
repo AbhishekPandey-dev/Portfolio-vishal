@@ -111,20 +111,24 @@ export default function AboutPage() {
       import("gsap/ScrollTrigger").then(({ ScrollTrigger }) => {
         gsap.registerPlugin(ScrollTrigger);
         
-        ScrollTrigger.create({
-          onUpdate: (self) => {
-            let skew = clamp(self.getVelocity() / -500);
-            if (Math.abs(skew) > Math.abs(proxy.skew)) {
-              proxy.skew = skew;
-              gsap.to(proxy, {
-                skew: 0,
-                duration: 0.8,
-                ease: "power3",
-                overwrite: true,
-                onUpdate: () => skewSetter(proxy.skew)
-              });
+        let mm = gsap.matchMedia();
+        
+        mm.add("(min-width: 1024px)", () => {
+          ScrollTrigger.create({
+            onUpdate: (self) => {
+              let skew = clamp(self.getVelocity() / -500);
+              if (Math.abs(skew) > Math.abs(proxy.skew)) {
+                proxy.skew = skew;
+                gsap.to(proxy, {
+                  skew: 0,
+                  duration: 0.8,
+                  ease: "power3",
+                  overwrite: true,
+                  onUpdate: () => skewSetter(proxy.skew)
+                });
+              }
             }
-          }
+          });
         });
       });
     });
@@ -257,21 +261,21 @@ export default function AboutPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-10%" }}
               transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: idx * 0.1 }}
-              className="group border-t border-vs-outline/20 flex flex-col md:flex-row gap-12 md:gap-24 lg:gap-40 py-20 md:py-32 px-6 md:px-12 lg:px-24 hover:bg-vs-foreground/[0.01] transition-colors duration-1000"
+              className="group border-t border-vs-outline/20 flex flex-col lg:flex-row gap-12 lg:gap-40 py-20 lg:py-32 px-6 md:px-12 lg:px-24 hover:bg-vs-foreground/[0.01] transition-colors duration-1000"
             >
-              <div className="md:w-[40%] flex flex-col justify-between">
+              <div className="lg:w-[40%] flex flex-col justify-between">
                 <div>
                   <div className="font-mono text-[10px] text-vs-accent mb-4 opacity-0 group-hover:opacity-100 transition-opacity">
                     {category.id}
                   </div>
-                  <h3 className="font-display text-[15vw] md:text-9xl lg:text-[12rem] font-black text-vs-outline/20 uppercase tracking-[0.02em] md:break-normal group-hover:text-vs-foreground transition-all duration-700 leading-[0.85] group-hover:scale-[1.02] origin-left">
+                  <h3 className="font-display text-[16vw] sm:text-[14vw] md:text-[11vw] lg:text-[9rem] xl:text-[11rem] font-black text-vs-outline/20 uppercase tracking-[0.02em] break-words group-hover:text-vs-foreground transition-all duration-700 leading-[0.85] group-hover:scale-[1.02] origin-left">
                     {category.category}
                   </h3>
                 </div>
-                <div className="hidden md:block h-px w-0 group-hover:w-full bg-vs-outline/20 transition-all duration-1000 mt-12" />
+                <div className="hidden lg:block h-px w-0 group-hover:w-full bg-vs-outline/20 transition-all duration-1000 mt-12" />
               </div>
               
-              <div className="md:w-[60%] grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-10 md:gap-x-14 gap-y-14 md:gap-y-20 items-center content-center">
+              <div className="lg:w-[60%] grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-4 xl:grid-cols-5 gap-x-6 sm:gap-x-10 md:gap-x-12 xl:gap-x-14 gap-y-10 sm:gap-y-14 md:gap-y-16 xl:gap-y-20 items-center content-center w-full">
                 {category.items.map((item, i) => (
                   <Magnetic key={item.name}>
                     <motion.div 
@@ -280,17 +284,17 @@ export default function AboutPage() {
                       whileHover={{ scale: 1.1, opacity: 1 }}
                       viewport={{ once: true }}
                       transition={{ duration: 0.5, delay: i * 0.05 }}
-                      className="flex flex-col items-center gap-6 cursor-pointer transition-all duration-500 group/icon"
+                      className="flex flex-col items-center gap-4 sm:gap-6 cursor-pointer transition-all duration-500 group/icon"
                     >
                       <div className="relative">
                         <img 
                           src={`/assets/tech-icons/${item.icon}`} 
                           alt={item.name}
-                          className="w-14 h-14 md:w-20 md:h-20 lg:w-24 lg:h-24 object-contain grayscale group-hover/icon:grayscale-0 transition-all duration-500" 
+                          className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 lg:w-20 lg:h-20 xl:w-24 xl:h-24 object-contain grayscale group-hover/icon:grayscale-0 transition-all duration-500" 
                         />
                         <div className="absolute -inset-4 bg-vs-accent/10 rounded-full blur-2xl opacity-0 group-hover/icon:opacity-100 transition-opacity -z-10" />
                       </div>
-                      <span className="font-headline text-[10px] md:text-xs font-bold tracking-[0.3em] uppercase text-vs-text-secondary group-hover/icon:text-vs-accent transition-colors">
+                      <span className="font-headline text-[9px] sm:text-[10px] md:text-xs font-bold tracking-[0.2em] sm:tracking-[0.3em] uppercase text-vs-text-secondary group-hover/icon:text-vs-accent transition-colors text-center text-balance w-full">
                         {item.name}
                       </span>
                     </motion.div>
