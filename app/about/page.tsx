@@ -204,7 +204,7 @@ export default function AboutPage() {
       {/* Brutalist Career Chronicle */}
       <section className="py-32 w-full border-t border-vs-outline/20">
         <div className="px-6 md:px-12 lg:px-24 max-w-[100rem] mx-auto mb-20 flex items-end justify-between">
-          <SectionLabel>EXPERIENCE_CHRONICLE</SectionLabel>
+          <SectionLabel>EXPERIENCE TIMELINE</SectionLabel>
           <div className="hidden md:block font-mono text-[10px] opacity-30 tracking-[0.3em] uppercase">
             SCROLL_TO_EXPLORE_HISTORY
           </div>
