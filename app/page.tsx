@@ -10,146 +10,168 @@ import { ByTheNumbers } from "@/components/sections/ByTheNumbers";
 import { ExperienceShowcase } from "@/components/sections/ExperienceShowcase";
 
 const demoIcons: IconProps[] = [
-  // Top Outer Ring
+  // Top Outer Ring - Essential (Always Visible)
   {
     id: 1,
     imageUrl: "REACT.png",
-    alt: "React",
-    className: "top-[18%] left-[5%]",
+    alt: "", // Decorative: hidden from screen readers to prevent noise
+    className: "top-[10%] left-[5%] md:top-[18%] md:left-[5%]",
   },
   {
     id: 2,
     imageUrl: "NODE JS.png",
-    alt: "Node.js",
-    className: "top-[18%] right-[5%]",
+    alt: "",
+    className: "top-[10%] right-[5%] md:top-[18%] md:right-[5%]",
   },
   {
     id: 3,
     imageUrl: "TYPESCRIPT.png",
-    alt: "TypeScript",
-    className: "top-[12%] left-[33%]",
+    alt: "",
+    className: "hidden md:block top-[12%] left-[33%]", // Hidden on mobile to avoid title overlap
   },
   {
     id: 4,
     imageUrl: "MONGO DB.png",
-    alt: "MongoDB",
-    className: "top-[12%] right-[33%]",
+    alt: "",
+    className: "hidden md:block top-[12%] right-[33%]",
   },
 
   // Side Rails
   {
     id: 5,
     imageUrl: "JAVASCRIPT.png",
-    alt: "JavaScript",
-    className: "top-[30%] left-[2%]",
+    alt: "",
+    className: "top-[40%] left-[2%] md:top-[30%] md:left-[2%]",
   },
   {
     id: 6,
     imageUrl: "HTML5.png",
-    alt: "HTML5",
-    className: "top-[30%] right-[2%]",
+    alt: "",
+    className: "top-[40%] right-[2%] md:top-[30%] md:right-[2%]",
   },
   {
     id: 7,
     imageUrl: "TAILWIND.png",
-    alt: "Tailwind CSS",
-    className: "top-[60%] left-[2%]",
+    alt: "",
+    className: "hidden sm:block top-[60%] left-[2%]", // Hidden on extra small screens
   },
   {
     id: 8,
     imageUrl: "BOOTSTRAP.png",
-    alt: "Bootstrap",
-    className: "top-[60%] right-[2%]",
+    alt: "",
+    className: "hidden sm:block top-[60%] right-[2%]",
   },
 
-  // Bottom Outer Ring
+  // Bottom Outer Ring - Essential
   {
     id: 9,
     imageUrl: "GITHUB.png",
-    alt: "GitHub",
-    className: "bottom-[5%] left-[5%]",
+    alt: "",
+    className: "bottom-[15%] left-[5%] md:bottom-[5%] md:left-[5%]",
   },
   {
     id: 10,
     imageUrl: "GIT.png",
-    alt: "Git",
-    className: "bottom-[5%] right-[5%]",
+    alt: "",
+    className: "bottom-[15%] right-[5%] md:bottom-[5%] md:right-[5%]",
   },
   {
     id: 11,
     imageUrl: "PYTHON.png",
-    alt: "Python",
-    className: "bottom-[5%] left-[30%]",
+    alt: "",
+    className: "hidden md:block bottom-[5%] left-[30%]",
   },
   {
     id: 12,
     imageUrl: "PHP.png",
-    alt: "PHP",
-    className: "bottom-[5%] right-[30%]",
+    alt: "",
+    className: "hidden md:block bottom-[5%] right-[30%]",
   },
 
-  // Floating Accents (Extreme edges)
+  // Floating Accents (Extreme edges - Desktop Only)
   {
     id: 13,
     imageUrl: "SHOPIFY.png",
-    alt: "Shopify",
-    className: "top-[25%] left-[12%]",
+    alt: "",
+    className: "hidden lg:block top-[25%] left-[12%]",
   },
   {
     id: 14,
     imageUrl: "WORDPRESS.png",
-    alt: "WordPress",
-    className: "top-[25%] right-[12%]",
+    alt: "",
+    className: "hidden lg:block top-[25%] right-[12%]",
   },
   {
     id: 15,
     imageUrl: "JAVA.png",
-    alt: "Java",
-    className: "bottom-[20%] left-[12%]",
+    alt: "",
+    className: "hidden lg:block bottom-[20%] left-[12%]",
   },
   {
     id: 16,
     imageUrl: "REDIS.png",
-    alt: "Redis",
-    className: "bottom-[20%] right-[12%]",
+    alt: "",
+    className: "hidden lg:block bottom-[20%] right-[12%]",
   },
 ];
 
 export default function Home() {
+  const subtitleText = "Full Stack Web Developer | UI/UX Designer | 8+ Years Experience";
+
   return (
     <>
-      {/* Section 1: Hero — Antigravity Entry */}
-      <FloatingIconsHero
-        title="Vishal Singh"
-        subtitle={
-          <ShinyText
-            text="Full Stack Web Developer | UI/UX Designer | 8+ Years Experience"
-            disabled={false}
-            speed={3}
-            delay={2}
-            spread={45}
-            className="text-2xl font-black tracking-tighter font-headline transition-opacity block"
-            color="#a1a1a1"
+      {/* Accessibility: Skip to main content for keyboard users */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-white focus:text-black focus:font-bold focus:rounded-md transition-all shadow-lg"
+      >
+        Skip to main content
+      </a>
+
+      <main id="main-content" className="flex min-h-screen flex-col w-full bg-background">
+        {/* Section 1: Hero — Antigravity Entry */}
+        <section aria-label="Hero Section" className="relative w-full">
+          <FloatingIconsHero
+            title="Vishal Singh"
+            subtitle={
+              <div
+                className="mx-auto max-w-[95%] text-balance md:max-w-none"
+                aria-label={subtitleText}
+              >
+                {/* Visual shiny text, hidden from screen readers to prevent fragmented reading */}
+                <div aria-hidden="true">
+                  <ShinyText
+                    text={subtitleText}
+                    disabled={false}
+                    speed={3}
+                    delay={2}
+                    spread={45}
+                    className="text-base sm:text-lg md:text-2xl font-black tracking-normal md:tracking-tighter font-headline transition-opacity block"
+                    color="#a1a1a1"
+                  />
+                </div>
+              </div>
+            }
+            icons={demoIcons}
+            className="bg-black"
           />
-        }
-        icons={demoIcons}
-        className="bg-black"
-      />
+        </section>
 
-      {/* Section 2: Signature Quote */}
-      <SignatureQuote />
+        {/* Section 2: Signature Quote */}
+        <SignatureQuote />
 
-      {/* Section 3: Selected Work (3 projects, ~300vh) */}
-      <SelectedWork />
+        {/* Section 3: Selected Work (3 projects, ~300vh) */}
+        <SelectedWork />
 
-      {/* Section 4: What I Do — Services */}
-      <WhatIDo />
+        {/* Section 4: What I Do — Services */}
+        <WhatIDo />
 
-      {/* Section 5: By The Numbers — Social Proof */}
-      <ByTheNumbers />
+        {/* Section 5: By The Numbers — Social Proof */}
+        <ByTheNumbers />
 
-      {/* Section 6: Experience & Clients */}
-      <ExperienceShowcase />
+        {/* Section 6: Experience & Clients */}
+        <ExperienceShowcase />
+      </main>
     </>
   );
 }
