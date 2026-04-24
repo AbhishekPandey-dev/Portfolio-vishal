@@ -322,7 +322,7 @@ export const BRAND_IMAGE_MAP: Record<string, string> = {
   "OnCloud9": "/images/mobile-img/cloud9.png",
   "Lily Ann Cabinets": "/images/mobile-img/lilyanncabinets.png",
   "Transform Health": "/images/mobile-img/transformhealth.png",
-  "Shaz & Kiks": "/images/mobile-img/shazkiks.png",
+  "Shaz & Kiks": "/images/mobile-img/shazandkiks.png",
   "Ava Cabinetry": "/images/mobile-img/avacabinetry.png",
   "Idus": "/images/mobile-img/idus.png",
 };
