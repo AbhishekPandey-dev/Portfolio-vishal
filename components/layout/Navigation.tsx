@@ -15,6 +15,13 @@ export function Navigation() {
 
   // Detect Footer to hide Nav
   useEffect(() => {
+    // Reset state on route change to ensure nav is visible and menu is closed
+    setIsAtFooter(false);
+    setIsOpen(false);
+
+    const footer = document.querySelector("#footer");
+    if (!footer) return;
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         setIsAtFooter(entry.isIntersecting);
@@ -22,13 +29,12 @@ export function Navigation() {
       { threshold: 0.1 },
     );
 
-    const footer = document.querySelector("#footer");
-    if (footer) observer.observe(footer);
+    observer.observe(footer);
 
     return () => {
-      if (footer) observer.unobserve(footer);
+      observer.disconnect();
     };
-  }, []);
+  }, [pathname]);
 
   // Prevent scrolling when menu is open
   useEffect(() => {

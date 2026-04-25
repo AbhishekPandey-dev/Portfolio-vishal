@@ -19,6 +19,17 @@ const SERVICE_OPTIONS = [
   'Other'
 ]
 
+function Noise() {
+  return (
+    <div
+      className="pointer-events-none fixed inset-0 z-[99] opacity-[0.035] mix-blend-overlay"
+      style={{
+        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+      }}
+    />
+  )
+}
+
 function FieldError({ message }: { message?: string }) {
   return (
     <AnimatePresence>
@@ -90,10 +101,13 @@ function CustomSelect({
             data-lenis-prevent
             className="absolute left-0 right-0 z-50 mt-2 max-h-60 overflow-y-auto rounded-2xl border border-white/10 bg-[#0d0d0d] p-2 shadow-2xl backdrop-blur-xl"
           >
-            {options.map((option) => (
-              <button
+            {options.map((option, index) => (
+              <motion.button
                 key={option}
                 type="button"
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.03, ease: EASING.expoOut }}
                 onClick={() => {
                   setSelected(option)
                   setIsOpen(false)
@@ -105,7 +119,7 @@ function CustomSelect({
                 }`}
               >
                 {option}
-              </button>
+              </motion.button>
             ))}
           </motion.div>
         )}
@@ -211,8 +225,26 @@ export function ContactForm() {
     state.status = 'idle'
   }
 
+  // Magnetic button logic
+  const buttonRef = useRef<HTMLButtonElement>(null)
+  const [btnPos, setBtnPos] = useState({ x: 0, y: 0 })
+  
+  const handleButtonMouseMove = (e: React.MouseEvent) => {
+    if (!buttonRef.current) return
+    const { clientX, clientY } = e
+    const { left, top, width, height } = buttonRef.current.getBoundingClientRect()
+    const x = (clientX - (left + width / 2)) * 0.35
+    const y = (clientY - (top + height / 2)) * 0.35
+    setBtnPos({ x, y })
+  }
+
+  const handleButtonMouseLeave = () => {
+    setBtnPos({ x: 0, y: 0 })
+  }
+
   return (
     <section className="relative min-h-screen overflow-hidden bg-black px-6 pb-24 pt-36 text-white md:px-12 lg:px-20">
+      <Noise />
       {/* Dynamic Background Light */}
       <motion.div
         className="pointer-events-none fixed inset-0 z-0 opacity-40 blur-[130px]"
@@ -235,14 +267,16 @@ export function ContactForm() {
             Contact
           </motion.span>
 
-          <motion.h1
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: DURATION.entrance, ease: EASING.expoOut }}
-            className="font-headline text-[clamp(3.8rem,11vw,9.75rem)] font-black uppercase leading-[0.85] tracking-[-0.05em]"
-          >
-            Let&apos;s talk
-          </motion.h1>
+          <div className="overflow-hidden">
+            <motion.h1
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              transition={{ duration: DURATION.entrance, ease: EASING.expoOut }}
+              className="font-headline text-[clamp(3.8rem,11vw,9.75rem)] font-black uppercase leading-[0.85] tracking-[-0.05em]"
+            >
+              Let&apos;s talk
+            </motion.h1>
+          </div>
 
           <motion.p
             initial={{ opacity: 0, y: 24 }}
@@ -271,7 +305,12 @@ export function ContactForm() {
             }}
             className="space-y-10"
           >
-            <div className="max-w-[540px] space-y-5">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="max-w-[540px] space-y-5"
+            >
               <p className="font-label text-[11px] uppercase tracking-[0.32em] text-vs-accent">
                 Available for work
               </p>
@@ -281,10 +320,13 @@ export function ContactForm() {
                 structure, we can shape something that feels premium and performs
                 hard.
               </p>
-            </div>
+            </motion.div>
 
             <div className="grid gap-6 sm:grid-cols-2">
-              <a
+              <motion.a
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.25 }}
                 href={`mailto:${CONTACT_EMAIL}`}
                 className="group relative rounded-[28px] border border-white/10 bg-white/[0.03] p-6 transition-all duration-500 hover:-translate-y-1 hover:border-vs-accent/60 hover:bg-vs-accent/[0.04] overflow-hidden"
               >
@@ -292,15 +334,18 @@ export function ContactForm() {
                 <span className="mb-5 flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-white/[0.03] text-vs-accent transition-transform duration-500 group-hover:scale-110">
                   <Mail size={20} />
                 </span>
-                <p className="font-label text-[10px] uppercase tracking-[0.28em] text-white/45">
+                <p className="font-label text-[10px] uppercase tracking-[0.28em] text-white/45 group-hover:tracking-[0.35em] transition-all duration-500">
                   Email
                 </p>
                 <p className="mt-3 break-all text-lg font-semibold text-white transition-colors duration-300 group-hover:text-vs-accent">
                   {CONTACT_EMAIL}
                 </p>
-              </a>
+              </motion.a>
 
-              <a
+              <motion.a
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
                 href={WHATSAPP_LINK}
                 target="_blank"
                 rel="noreferrer"
@@ -310,13 +355,13 @@ export function ContactForm() {
                 <span className="mb-5 flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-white/[0.03] text-vs-accent transition-transform duration-500 group-hover:scale-110">
                   <MessageCircle size={20} />
                 </span>
-                <p className="font-label text-[10px] uppercase tracking-[0.28em] text-white/45">
+                <p className="font-label text-[10px] uppercase tracking-[0.28em] text-white/45 group-hover:tracking-[0.35em] transition-all duration-500">
                   WhatsApp
                 </p>
                 <p className="mt-3 text-lg font-semibold text-white transition-colors duration-300 group-hover:text-vs-accent">
                   Start a chat
                 </p>
-              </a>
+              </motion.a>
             </div>
 
             <div className="rounded-[28px] border border-white/10 bg-white/[0.03] p-6">
@@ -371,7 +416,7 @@ export function ContactForm() {
 
                     <div className="grid gap-8 md:grid-cols-2">
                       <div className="group relative">
-                        <span className="font-label text-[10px] uppercase tracking-[0.3em] text-white/45 group-focus-within:text-vs-accent transition-colors duration-300">
+                        <span className="font-label text-[10px] uppercase tracking-[0.3em] text-white/45 group-focus-within:text-vs-accent group-focus-within:tracking-[0.4em] transition-all duration-500">
                           Your name
                         </span>
                         <input
@@ -380,13 +425,13 @@ export function ContactForm() {
                           required
                           placeholder="John Doe"
                           suppressHydrationWarning
-                          className="mt-2 w-full border-b border-white/18 bg-transparent pb-4 text-white outline-none transition-all duration-300 placeholder:text-white/10 focus:border-vs-accent"
+                          className="mt-2 w-full border-b border-white/18 bg-transparent pb-4 text-white outline-none transition-all duration-500 placeholder:text-white/10 focus:border-vs-accent group-hover:border-white/40"
                         />
                         <FieldError message={state.errors?.name} />
                       </div>
 
                       <div className="group relative">
-                        <span className="font-label text-[10px] uppercase tracking-[0.3em] text-white/45 group-focus-within:text-vs-accent transition-colors duration-300">
+                        <span className="font-label text-[10px] uppercase tracking-[0.3em] text-white/45 group-focus-within:text-vs-accent group-focus-within:tracking-[0.4em] transition-all duration-500">
                           Your email
                         </span>
                         <input
@@ -395,17 +440,17 @@ export function ContactForm() {
                           required
                           placeholder="john@example.com"
                           suppressHydrationWarning
-                          className="mt-2 w-full border-b border-white/18 bg-transparent pb-4 text-white outline-none transition-all duration-300 placeholder:text-white/10 focus:border-vs-accent"
+                          className="mt-2 w-full border-b border-white/18 bg-transparent pb-4 text-white outline-none transition-all duration-500 placeholder:text-white/10 focus:border-vs-accent group-hover:border-white/40"
                         />
                         <FieldError message={state.errors?.email} />
                       </div>
                     </div>
 
                     <div className="group relative">
-                      <span className="font-label text-[10px] uppercase tracking-[0.3em] text-white/45 group-focus-within:text-vs-accent transition-colors duration-300">
+                      <span className="font-label text-[10px] uppercase tracking-[0.3em] text-white/45 group-focus-within:text-vs-accent group-focus-within:tracking-[0.4em] transition-all duration-500">
                         Project type
                       </span>
-                      <div className="mt-2">
+                      <div className="mt-2 group-hover:border-white/40 transition-colors duration-500">
                         <CustomSelect 
                           name="projectType" 
                           options={SERVICE_OPTIONS} 
@@ -416,7 +461,7 @@ export function ContactForm() {
                     </div>
 
                     <div className="group relative">
-                      <span className="font-label text-[10px] uppercase tracking-[0.3em] text-white/45 group-focus-within:text-vs-accent transition-colors duration-300">
+                      <span className="font-label text-[10px] uppercase tracking-[0.3em] text-white/45 group-focus-within:text-vs-accent group-focus-within:tracking-[0.4em] transition-all duration-500">
                         Your vision
                       </span>
                       <textarea
@@ -426,7 +471,7 @@ export function ContactForm() {
                         rows={5}
                         data-lenis-prevent
                         placeholder="Tell me about your goals, scope, and timeline."
-                        className="mt-2 w-full resize-none border-b border-white/18 bg-transparent pb-4 text-white outline-none transition-all duration-300 placeholder:text-white/10 focus:border-vs-accent"
+                        className="mt-2 w-full resize-none border-b border-white/18 bg-transparent pb-4 text-white outline-none transition-all duration-500 placeholder:text-white/10 focus:border-vs-accent group-hover:border-white/40"
                       />
                       <FieldError message={state.errors?.message} />
                     </div>
@@ -443,11 +488,17 @@ export function ContactForm() {
                         </motion.div>
                       )}
 
-                      <button
+                      <motion.button
+                        ref={buttonRef}
                         type="submit"
                         disabled={pending}
-                        className="group relative h-14 w-full overflow-hidden rounded-full bg-vs-accent font-headline text-xs font-black uppercase tracking-[0.3em] text-black transition-all duration-500 hover:bg-white disabled:opacity-50"
+                        onMouseMove={handleButtonMouseMove}
+                        onMouseLeave={handleButtonMouseLeave}
+                        animate={{ x: btnPos.x, y: btnPos.y }}
+                        transition={{ type: "spring", damping: 20, stiffness: 150, mass: 0.1 }}
+                        className="group relative h-14 w-full overflow-hidden rounded-full bg-vs-accent font-headline text-xs font-black uppercase tracking-[0.3em] text-black transition-colors duration-500 hover:bg-white disabled:opacity-50"
                       >
+                        <div className="absolute inset-0 z-0 bg-white opacity-0 transition-opacity duration-500 group-hover:opacity-10" />
                         <AnimatePresence mode="wait">
                           {pending ? (
                             <motion.div
@@ -473,7 +524,7 @@ export function ContactForm() {
                             </motion.div>
                           )}
                         </AnimatePresence>
-                      </button>
+                      </motion.button>
                     </div>
                   </form>
                 </motion.div>
