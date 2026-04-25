@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { NAV_LINKS } from "@/lib/constants";
 import Image from "next/image";
+import { cn } from "@/lib/utils";
 
 export function Navigation() {
   const pathname = usePathname();
@@ -58,6 +59,7 @@ export function Navigation() {
           second: "2-digit",
           timeZone: "Asia/Kolkata",
           hour12: true,
+          hourCycle: "h12",
         }) + " IST"
       );
     };
@@ -69,14 +71,17 @@ export function Navigation() {
   return (
     <>
       {/* Permanent Header Bar */}
-      <AnimatePresence>
+      <AnimatePresence mode="wait">
         {!isAtFooter && (
           <motion.header
             initial={{ y: -100, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: -100, opacity: 0 }}
             transition={{ duration: 0.6, ease: [0.33, 1, 0.68, 1] }}
-            className="fixed top-0 w-full z-[60] flex justify-between items-center px-6 py-6 md:px-12 pointer-events-none mix-blend-difference"
+            className={cn(
+              "fixed top-0 w-full z-[60] flex justify-between items-center px-6 py-4 md:py-8 md:px-12 pointer-events-none transition-all duration-500",
+              !isOpen && "bg-[#050505]/40 backdrop-blur-md border-b border-white/[0.05] md:bg-transparent md:backdrop-blur-none md:border-none md:mix-blend-difference"
+            )}
           >
             <div className="pointer-events-auto">
               <Link
