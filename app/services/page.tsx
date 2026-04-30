@@ -4,6 +4,7 @@ import { useRef, useMemo } from "react";
 import { gsap, ScrollTrigger } from "@/lib/gsap";
 import { useGSAP } from "@gsap/react";
 import { SectionLabel } from "@/components/ui/SectionLabel";
+import { InteractiveCore3D } from "@/components/ui/InteractiveCore3D";
 
 // Define a local interface to match the data we need for the GSAP effect
 interface ServiceStep {
@@ -191,6 +192,7 @@ export default function ServicesPage() {
 
   return (
     <div ref={containerRef} className="bg-black pt-32 pb-32 overflow-x-hidden">
+      <InteractiveCore3D />
       {/* HEADER SECTION (BEFORE PINNING) */}
       <div className="text-center min-h-[100dvh] flex flex-col justify-center items-center px-6">
         <SectionLabel>What I Offer</SectionLabel>

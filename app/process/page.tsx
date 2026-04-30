@@ -4,6 +4,7 @@ import { useRef, useMemo } from "react";
 import { gsap, ScrollTrigger } from "@/lib/gsap";
 import { useGSAP } from "@gsap/react";
 import { SectionLabel } from "@/components/ui/SectionLabel";
+import { InteractiveCore3D } from "@/components/ui/InteractiveCore3D";
 import { ProcessStep } from "@/types";
 
 const STEPS: ProcessStep[] = [
@@ -196,6 +197,7 @@ export default function ProcessPage() {
 
   return (
     <div ref={containerRef} className="bg-black pt-32 pb-32 overflow-x-hidden">
+      <InteractiveCore3D />
       {/* HEADER SECTION (BEFORE PINNING) */}
       <div className="text-center min-h-[100dvh] flex flex-col justify-center items-center px-6">
         <SectionLabel>Methodology</SectionLabel>
