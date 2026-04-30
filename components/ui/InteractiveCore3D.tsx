@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 
@@ -31,7 +31,19 @@ export function InteractiveCore3D() {
   const outerFacesRef = useRef<(HTMLDivElement | null)[]>([]);
   const innerCubeRef  = useRef<HTMLDivElement>(null);
 
+  // Hide entirely on screens < 1024px — no DOM, no GSAP, pure performance
+  const [isDesktop, setIsDesktop] = useState(false);
+
   useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    setIsDesktop(mq.matches);
+    const onChange = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+
+  useEffect(() => {
+    if (!isDesktop) return;                          // ← skip all GSAP on mobile
     if (!tesseractRef.current || !wrapperRef.current || !innerCubeRef.current) return;
 
     gsap.registerPlugin(ScrollTrigger);
@@ -88,7 +100,7 @@ export function InteractiveCore3D() {
       idleAnim.kill();
       innerAnim.kill();
     };
-  }, []);
+  }, [isDesktop]);
 
   /* ─── Hover ──────────────────────────────────────────── */
   const handleMouseEnter = () => {
@@ -157,6 +169,9 @@ export function InteractiveCore3D() {
       ease: "elastic.out(1, 0.3)",
     }, 0.6);
   };
+
+  // Render nothing on mobile/tablet — keeps scroll buttery smooth
+  if (!isDesktop) return null;
 
   return (
     /**
