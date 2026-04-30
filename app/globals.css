@@ -7,6 +7,7 @@
   --color-vs-container: #0E0E0E;
   --color-vs-outline: #444748;
   --color-vs-accent: #00D9FF;
+  --vs-accent-rgb: 0, 217, 255;
   --color-vs-accent-muted: rgba(0, 217, 255, 0.15);
   --color-vs-accent-glow: rgba(0, 217, 255, 0.3);
   --color-vs-text-secondary: #A1A1A1;
