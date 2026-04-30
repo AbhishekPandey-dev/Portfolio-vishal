@@ -60,6 +60,7 @@ export default function ServicesPage() {
   };
 
   useGSAP(() => {
+    const isMobile = window.innerWidth < 768;
     const sections = gsap.utils.toArray(".service-section") as HTMLElement[];
     
     // 1. PIN THE TITLE (Desktop Only)
@@ -91,15 +92,22 @@ export default function ServicesPage() {
         onToggle: (self) => {
           if (self.isActive) {
             const counter = document.querySelector(".current-service");
-            if (counter) {
-              const newNum = (i + 1).toString().padStart(2, '0');
-              if (counter.textContent !== newNum) {
-                counter.textContent = newNum;
-                gsap.fromTo(counter, 
-                  { y: 5, opacity: 0 },
-                  { y: 0, opacity: 1, duration: 0.3 }
-                );
-              }
+            const mobileCounter = document.querySelector(".current-service-mobile");
+            const newNum = (i + 1).toString().padStart(2, '0');
+            
+            if (counter && counter.textContent !== newNum) {
+              counter.textContent = newNum;
+              gsap.fromTo(counter, 
+                { y: 5, opacity: 0 },
+                { y: 0, opacity: 1, duration: 0.3 }
+              );
+            }
+            if (mobileCounter && mobileCounter.textContent !== newNum) {
+              mobileCounter.textContent = newNum;
+              gsap.fromTo(mobileCounter, 
+                { y: 5, opacity: 0 },
+                { y: 0, opacity: 1, duration: 0.3 }
+              );
             }
           }
         }
@@ -118,7 +126,7 @@ export default function ServicesPage() {
             trigger: section,
             start: "top bottom",
             end: "top top",
-            scrub: 1,
+            scrub: isMobile ? 1.5 : 1,
           }
         }
       );
@@ -127,7 +135,7 @@ export default function ServicesPage() {
       gsap.fromTo(content,
         { clipPath: "circle(0% at 50% 50%)", opacity: 0 },
         {
-          clipPath: "circle(100% at 50% 50%)",
+          clipPath: "circle(150% at 50% 50%)",
           opacity: 1,
           pointerEvents: "auto",
           ease: "none",
@@ -135,23 +143,27 @@ export default function ServicesPage() {
             trigger: section,
             start: "top bottom",
             end: "top top",
-            scrub: true,
+            scrub: isMobile ? 1.2 : true,
           }
         }
       );
 
       // 5. WORD SCRUBBING
-      gsap.to(words, {
-        opacity: 1,
-        stagger: 0.1,
-        ease: "none",
-        scrollTrigger: {
-          trigger: section,
-          start: "top 10%",
-          end: "top -50%",
-          scrub: 0.5,
+      gsap.fromTo(words, 
+        { opacity: 0.2, y: 10 },
+        {
+          opacity: 1,
+          y: 0,
+          stagger: 0.1,
+          ease: "none",
+          scrollTrigger: {
+            trigger: section,
+            start: "top 10%",
+            end: "top -50%",
+            scrub: isMobile ? 1.5 : 0.5,
+          }
         }
-      });
+      );
 
       // 6. STAGGERED TAGS
       gsap.fromTo(tags,
@@ -180,7 +192,7 @@ export default function ServicesPage() {
   return (
     <div ref={containerRef} className="bg-black pt-32 pb-32 overflow-x-hidden">
       {/* HEADER SECTION (BEFORE PINNING) */}
-      <div className="text-center min-h-screen flex flex-col justify-center items-center px-6">
+      <div className="text-center min-h-[100dvh] flex flex-col justify-center items-center px-6">
         <SectionLabel>What I Offer</SectionLabel>
         <h2 className="font-headline text-6xl md:text-[12vw] font-black tracking-tighter uppercase mt-4 leading-[0.8]">
           The <br className="md:hidden" /> <span className="text-white/20">Services</span>
@@ -193,7 +205,7 @@ export default function ServicesPage() {
       <div ref={triggerRef} className="relative flex flex-col md:flex-row">
         
         {/* PINNED SIDE HEADER (DESKTOP) */}
-        <div className="pinned-header hidden md:flex w-1/3 h-screen flex-col justify-center px-12 z-50 pointer-events-none">
+        <div className="pinned-header hidden md:flex w-1/3 h-[100dvh] flex-col justify-center px-12 z-50 pointer-events-none">
           <div className="border-l-2 border-vs-accent pl-8 py-4">
             <h3 className="font-headline text-5xl font-black uppercase tracking-tight">What I</h3>
             <h3 className="font-headline text-8xl font-black uppercase tracking-tighter text-vs-accent">Offer</h3>
@@ -203,15 +215,22 @@ export default function ServicesPage() {
           </p>
         </div>
 
+        {/* MOBILE STICKY PHASE INDICATOR */}
+        <div className="md:hidden fixed top-24 right-6 z-50 mix-blend-difference pointer-events-none">
+          <p className="font-label text-xs uppercase tracking-[0.4em] text-white/50">
+            <span className="current-service-mobile">01</span> / 05
+          </p>
+        </div>
+
         {/* SCROLLING CONTENT STACK */}
         <div className="w-full md:w-2/3">
           {SERVICES.map((step) => (
             <div 
               key={step.number} 
-              className="service-section min-h-screen flex flex-col justify-center items-center text-center px-8 md:px-24 bg-black overflow-hidden border-t border-white/5"
+              className="service-section min-h-[120dvh] md:min-h-[100dvh] flex flex-col justify-center items-center text-center px-8 md:px-24 bg-black overflow-hidden border-t border-white/5"
             >
               {/* Massive Background Number */}
-              <div className="step-number text-[220px] md:text-[420px] massive-stroke absolute inset-0 flex items-center justify-center z-0 select-none opacity-10 font-black font-headline tracking-tighter pointer-events-none will-change-transform">
+              <div aria-hidden="true" className="step-number text-[220px] md:text-[420px] massive-stroke absolute inset-0 flex items-center justify-center z-0 select-none opacity-10 font-black font-headline tracking-tighter pointer-events-none will-change-transform">
                 {step.number}
               </div>
               
@@ -221,7 +240,8 @@ export default function ServicesPage() {
                 </h3>
                 
                 <p className="font-body text-xl md:text-2xl text-white/80 mx-auto leading-relaxed mb-12 max-w-2xl font-light">
-                  {splitText(step.description)}
+                  <span className="sr-only">{step.description}</span>
+                  <span aria-hidden="true">{splitText(step.description)}</span>
                 </p>
                 
                 {step.tags && (

@@ -65,6 +65,7 @@ export default function ProcessPage() {
   };
 
   useGSAP(() => {
+    const isMobile = window.innerWidth < 768;
     const sections = gsap.utils.toArray(".process-section") as HTMLElement[];
     
     // 1. PIN THE TITLE (Desktop Only)
@@ -130,7 +131,7 @@ export default function ProcessPage() {
             trigger: section,
             start: "top bottom",
             end: "top top",
-            scrub: 1,
+            scrub: isMobile ? 1.5 : 1,
           }
         }
       );
@@ -139,7 +140,7 @@ export default function ProcessPage() {
       gsap.fromTo(content,
         { clipPath: "circle(0% at 50% 50%)", opacity: 0 },
         {
-          clipPath: "circle(100% at 50% 50%)",
+          clipPath: "circle(150% at 50% 50%)",
           opacity: 1,
           pointerEvents: "auto",
           ease: "none",
@@ -147,7 +148,7 @@ export default function ProcessPage() {
             trigger: section,
             start: "top bottom",
             end: "top top",
-            scrub: true,
+            scrub: isMobile ? 1.2 : true,
           }
         }
       );
@@ -164,7 +165,7 @@ export default function ProcessPage() {
             trigger: section,
             start: "top 10%",
             end: "top -50%",
-            scrub: 0.5,
+            scrub: isMobile ? 1.5 : 0.5,
           }
         }
       );
@@ -196,7 +197,7 @@ export default function ProcessPage() {
   return (
     <div ref={containerRef} className="bg-black pt-32 pb-32 overflow-x-hidden">
       {/* HEADER SECTION (BEFORE PINNING) */}
-      <div className="text-center min-h-screen flex flex-col justify-center items-center px-6">
+      <div className="text-center min-h-[100dvh] flex flex-col justify-center items-center px-6">
         <SectionLabel>Methodology</SectionLabel>
         <h2 className="font-headline text-6xl md:text-[12vw] font-black tracking-tighter uppercase mt-4 leading-[0.8]">
           The <br className="md:hidden" /> <span className="text-white/20">Process</span>
@@ -209,7 +210,7 @@ export default function ProcessPage() {
       <div ref={triggerRef} className="relative flex flex-col md:flex-row">
         
         {/* PINNED SIDE HEADER (DESKTOP) */}
-        <div className="pinned-header hidden md:flex w-1/3 h-screen flex-col justify-center px-12 z-50 pointer-events-none">
+        <div className="pinned-header hidden md:flex w-1/3 h-[100dvh] flex-col justify-center px-12 z-50 pointer-events-none">
           <div className="border-l-2 border-vs-accent pl-8 py-4">
             <h3 className="font-headline text-5xl font-black uppercase tracking-tight">How I</h3>
             <h3 className="font-headline text-8xl font-black uppercase tracking-tighter text-vs-accent">Work</h3>
@@ -231,7 +232,7 @@ export default function ProcessPage() {
           {STEPS.map((step) => (
             <div 
               key={step.number} 
-              className="process-section min-h-screen flex flex-col justify-center items-center text-center px-8 md:px-24 bg-black overflow-hidden border-t border-white/5"
+              className="process-section min-h-[120dvh] md:min-h-[100dvh] flex flex-col justify-center items-center text-center px-8 md:px-24 bg-black overflow-hidden border-t border-white/5"
             >
               {/* Massive Background Number */}
               <div aria-hidden="true" className="step-number text-[220px] md:text-[420px] massive-stroke absolute inset-0 flex items-center justify-center z-0 select-none opacity-10 font-black font-headline tracking-tighter pointer-events-none will-change-transform">
