@@ -1,8 +1,29 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, ArrowUpRight } from "lucide-react";
 import * as THREE from "three";
+import dynamic from "next/dynamic";
+
+const ShaderGradientWithNoSSR = dynamic(
+  () =>
+    import("@shadergradient/react").then((mod) => {
+      const { ShaderGradientCanvas, ShaderGradient } = mod;
+      function GradientBg({ urlString }: { urlString: string }) {
+        return (
+          <ShaderGradientCanvas
+            style={{ position: "absolute", inset: 0, zIndex: 0 }}
+            pixelDensity={1}
+            fov={45}
+          >
+            <ShaderGradient control="query" urlString={urlString} />
+          </ShaderGradientCanvas>
+        );
+      }
+      return GradientBg;
+    }),
+  { ssr: false }
+);
 
 type MediaMode = "desktop" | "compact";
 
@@ -396,6 +417,17 @@ const TOTAL = PROJECTS.length;
 const PLANE_GAP = 4.7;
 const CAMERA_START_Z = 5;
 const LAST_PROJECT_HOLD_VH = 0.85;
+const NAV_SAFE_TOP_DESKTOP = 132;
+const NAV_SAFE_TOP_MOBILE = 92;
+// Desktop: 16:9, Mobile: 1:1
+const DESKTOP_MEDIA_ASPECT = 16 / 9;
+const COMPACT_MEDIA_ASPECT = 1 / 1;
+
+// Shader gradient URLs per project mood – dark flowing gradients
+const PROJECT_GRADIENTS: string[] = PROJECTS.map(
+  (p) =>
+    `https://www.shadergradient.co/customize?animate=on&cDistance=28&cPolarAngle=120&color1=${encodeURIComponent(p.mood.blob1)}&color2=${encodeURIComponent(p.mood.background)}&color3=${encodeURIComponent(p.mood.blob2)}&lightType=3d&shader=defaults&type=waterPlane&uFrequency=5&uSpeed=0.2&uStrength=1.2&grain=on&grainBlending=0.4`
+);
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max);
@@ -407,6 +439,32 @@ function lerp(start: number, end: number, amount: number) {
 
 function colorToCss(color: THREE.Color) {
   return `#${color.getHexString()}`;
+}
+
+function setTextureCover(
+  texture: THREE.Texture,
+  planeAspect: number,
+  sourceAspect: number
+) {
+  texture.offset.set(0, 0);
+  texture.repeat.set(1, 1);
+
+  if (!Number.isFinite(sourceAspect) || sourceAspect <= 0) {
+    texture.needsUpdate = true;
+    return;
+  }
+
+  if (sourceAspect > planeAspect) {
+    const repeatX = planeAspect / sourceAspect;
+    texture.repeat.x = repeatX;
+    texture.offset.x = (1 - repeatX) / 2;
+  } else {
+    const repeatY = sourceAspect / planeAspect;
+    texture.repeat.y = repeatY;
+    texture.offset.y = (1 - repeatY) / 2;
+  }
+
+  texture.needsUpdate = true;
 }
 
 function supportsWebGL() {
@@ -519,7 +577,7 @@ export function DepthProjectGallery() {
     renderer.outputColorSpace = THREE.SRGBColorSpace;
 
     const loader = new THREE.TextureLoader();
-    const geometry = new THREE.PlaneGeometry(3, 3);
+    const geometry = new THREE.PlaneGeometry(1, 1);
     const videos: HTMLVideoElement[] = [];
     const materials: THREE.MeshBasicMaterial[] = [];
     const textures: THREE.Texture[] = [];
@@ -538,9 +596,18 @@ export function DepthProjectGallery() {
         const videoMedia = createVideoTexture(project);
         texture = videoMedia.texture;
         videos.push(videoMedia.video);
-        videoMedia.video.addEventListener("loadedmetadata", markMediaSettled, {
-          once: true,
-        });
+        videoMedia.video.addEventListener(
+          "loadedmetadata",
+          () => {
+            setTextureCover(
+              texture,
+              DESKTOP_MEDIA_ASPECT,
+              videoMedia.video.videoWidth / videoMedia.video.videoHeight
+            );
+            markMediaSettled();
+          },
+          { once: true }
+        );
         videoMedia.video.addEventListener("error", markMediaSettled, { once: true });
         videoMedia.video.load();
       } else {
@@ -549,7 +616,11 @@ export function DepthProjectGallery() {
           (loadedTexture) => {
             loadedTexture.colorSpace = THREE.SRGBColorSpace;
             loadedTexture.anisotropy = renderer.capabilities.getMaxAnisotropy();
-            loadedTexture.needsUpdate = true;
+            setTextureCover(
+              loadedTexture,
+              COMPACT_MEDIA_ASPECT,
+              loadedTexture.image.width / loadedTexture.image.height
+            );
             markMediaSettled();
           },
           undefined,
@@ -682,8 +753,9 @@ export function DepthProjectGallery() {
       const nearestIndex = blend >= 0.5 ? nextPlaneIndex : currentPlaneIndex;
       const velocityIntensity = clamp(Math.abs(velocity) / 0.18, 0, 1);
       const compact = mediaMode === "compact";
-      const xSpread = compact ? 0.38 : 1;
-      const baseScale = compact ? 0.82 : 1.1;
+      const mediaAspect = compact ? COMPACT_MEDIA_ASPECT : DESKTOP_MEDIA_ASPECT;
+      const xSpread = compact ? 0.28 : 0.34;
+      const planeHeight = compact ? 3.05 : 3.28;
       const drift = clamp(velocity / 0.18, -1, 1) * 0.13;
 
       camera.position.z = CAMERA_START_Z - currentDepth * PLANE_GAP;
@@ -707,7 +779,7 @@ export function DepthProjectGallery() {
         plane.rotation.x = -pointerCurrent.y * 0.08 * breath;
         plane.rotation.y = pointerCurrent.x * 0.08 * breath;
         const pulse = 1 + 0.045 * breath;
-        plane.scale.set(baseScale * pulse, baseScale * pulse, 1);
+        plane.scale.set(planeHeight * mediaAspect * pulse, planeHeight * pulse, 1);
       });
 
       applyMood(currentPlaneIndex, nextPlaneIndex, blend);
@@ -763,7 +835,7 @@ export function DepthProjectGallery() {
     <section
       ref={rootRef}
       aria-label="Depth project gallery"
-      className="relative w-full bg-black"
+      className="relative w-full"
       style={{ height: `${(TOTAL + 1) * 100}svh` }}
     >
       <div
@@ -776,9 +848,20 @@ export function DepthProjectGallery() {
             "--depth-blob-2": PROJECTS[0].mood.blob2,
             "--depth-progress": 0,
             "--depth-velocity": 0,
+            "--work-nav-safe-top-desktop": `${NAV_SAFE_TOP_DESKTOP}px`,
+            "--work-nav-safe-top-mobile": `${NAV_SAFE_TOP_MOBILE}px`,
           } as React.CSSProperties
         }
       >
+        {/* ── SHADER GRADIENT BACKGROUND ──────────────────────────── */}
+        <div className="absolute inset-0 z-0 transition-opacity duration-700">
+          <ShaderGradientWithNoSSR urlString={PROJECT_GRADIENTS[activeIndex]} />
+        </div>
+
+        {/* Dark vignette overlay to keep content legible */}
+        <div className="absolute inset-0 z-[1] bg-black/30 pointer-events-none" />
+
+        {/* THREE.js canvas sits on top of gradient */}
         <canvas
           ref={canvasRef}
           className="absolute inset-0 z-10 h-full w-full"
@@ -796,34 +879,40 @@ export function DepthProjectGallery() {
           </div>
         )}
 
-        <div className="pointer-events-none absolute inset-0 z-20 flex flex-col justify-between px-5 py-6 sm:px-8 lg:px-12 lg:py-10">
+        {/* ── HUD LAYER ──────────────────────────────────────────── */}
+        <div className="pointer-events-none absolute inset-0 z-20 flex flex-col px-5 pb-5 pt-[var(--work-nav-safe-top-mobile)] sm:px-8 sm:pb-8 lg:px-12 lg:pb-10 lg:pt-[var(--work-nav-safe-top-desktop)]">
+
+          {/* Top bar */}
           <header className={`flex items-start justify-between gap-5 ${toneClass}`}>
-            <div>
-              <p
-                className={`font-label text-[10px] uppercase tracking-[0.35em] ${mutedToneClass}`}
-              >
+            <div className="max-w-[15rem]">
+              <p className={`font-label text-[10px] uppercase tracking-[0.35em] ${mutedToneClass}`}>
                 Work Index
               </p>
-              <h1 className="mt-2 font-headline text-5xl font-black uppercase leading-[0.88] tracking-normal sm:text-7xl lg:text-8xl">
-                Depth
-                <br />
-                Projects
+              <h1 className="mt-1.5 font-headline text-2xl font-black uppercase leading-none tracking-normal sm:text-3xl">
+                Selected Builds
               </h1>
             </div>
-            <div
-              className={`hidden max-w-[18rem] text-right font-label text-[10px] uppercase tracking-[0.22em] ${mutedToneClass} sm:block`}
-            >
-              {String(activeIndex + 1).padStart(2, "0")} /{" "}
+            <div className={`text-right font-label text-[10px] uppercase tracking-[0.22em] ${mutedToneClass}`}>
+              <span className="tabular-nums text-xl font-black leading-none {toneClass}">
+                {String(activeIndex + 1).padStart(2, "0")}
+              </span>
+              <span className="mx-1">/</span>
               {String(TOTAL).padStart(2, "0")}
             </div>
           </header>
 
-          <div className="grid items-end gap-7 lg:grid-cols-[minmax(180px,280px)_1fr_minmax(220px,340px)]">
+          {/* Spacer */}
+          <div className="flex-1" />
+
+          {/* Bottom area: nav left + info right */}
+          <div className="grid gap-7 lg:grid-cols-[minmax(190px,240px)_1fr_minmax(340px,480px)]">
+
+            {/* ── PROJECT NAV (desktop only) */}
             <nav
               aria-label="Project selector"
-              className="pointer-events-auto hidden max-h-[46vh] overflow-hidden lg:block"
+              className="pointer-events-auto hidden max-h-[calc(100svh-var(--work-nav-safe-top-desktop)-3rem)] overflow-y-auto pr-2 lg:block"
             >
-              <div className={`grid gap-1 border-l pl-4 ${borderToneClass}`}>
+              <div className={`grid gap-0.5 border-l pl-4 ${borderToneClass}`}>
                 {navProjects.map((project) => {
                   const isActive = project.index === activeIndex;
                   return (
@@ -831,14 +920,12 @@ export function DepthProjectGallery() {
                       key={project.title}
                       type="button"
                       onClick={() => selectProject(project.index)}
-                      className={`group grid grid-cols-[2.2rem_1fr] items-center gap-2 py-1.5 text-left font-label text-[10px] uppercase tracking-[0.16em] transition-colors ${
+                      className={`group grid grid-cols-[2rem_1fr] items-center gap-2 py-1 text-left font-label text-[9px] uppercase tracking-[0.14em] transition-colors ${
                         isActive ? toneClass : mutedToneClass
                       }`}
                       aria-current={isActive ? "true" : undefined}
                     >
-                      <span className="tabular-nums">
-                        {String(project.index + 1).padStart(2, "0")}
-                      </span>
+                      <span className="tabular-nums">{String(project.index + 1).padStart(2, "0")}</span>
                       <span className="truncate">{project.title}</span>
                     </button>
                   );
@@ -848,43 +935,144 @@ export function DepthProjectGallery() {
 
             <div className="hidden lg:block" />
 
-            <article className={`${toneClass} justify-self-end text-right`}>
-              <div className="mb-4 flex flex-wrap justify-end gap-2">
-                {activeProject.categories.map((category) => (
-                  <span
-                    key={category}
-                    className={`border px-2.5 py-1 font-label text-[9px] uppercase tracking-[0.22em] ${borderToneClass}`}
-                  >
-                    {category}
-                  </span>
-                ))}
-              </div>
-              <h2 className="font-headline text-5xl font-black uppercase leading-[0.84] tracking-normal sm:text-6xl xl:text-7xl">
-                {activeProject.title}
-              </h2>
-              <a
-                href={activeProject.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`pointer-events-auto mt-4 inline-flex items-center gap-2 font-label text-[10px] uppercase tracking-[0.28em] transition-opacity hover:opacity-70 ${mutedToneClass}`}
+            {/* ── PROJECT INFO PANEL (redesigned) */}
+            <article
+              className={`pointer-events-auto depth-gallery__info-panel`}
+              aria-label={`Project: ${activeProject.title}`}
+            >
+              {/* Glass card */}
+              <div
+                className="relative overflow-hidden rounded-2xl p-5 sm:p-6"
+                style={{
+                  background:
+                    activeProject.mood.text === "dark"
+                      ? "rgba(255,255,255,0.12)"
+                      : "rgba(0,0,0,0.35)",
+                  backdropFilter: "blur(20px) saturate(1.4)",
+                  WebkitBackdropFilter: "blur(20px) saturate(1.4)",
+                  border: `1px solid ${
+                    activeProject.mood.text === "dark"
+                      ? "rgba(0,0,0,0.1)"
+                      : "rgba(255,255,255,0.12)"
+                  }`,
+                  boxShadow: "0 8px 40px rgba(0,0,0,0.3)",
+                }}
               >
-                {activeProject.displayUrl}
-                <ExternalLink aria-hidden="true" size={13} strokeWidth={1.7} />
-              </a>
-              <div className="mt-5 flex flex-wrap justify-end gap-2">
-                {activeProject.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className={`border px-2.5 py-1 font-label text-[8px] uppercase tracking-[0.16em] ${borderToneClass} ${mutedToneClass}`}
-                  >
-                    {tag}
+                {/* Accent bar */}
+                <div
+                  className="absolute top-0 left-0 h-0.5 w-full"
+                  style={{
+                    background: `linear-gradient(90deg, ${activeProject.mood.accent}, transparent)`,
+                  }}
+                />
+
+                {/* Category + index row */}
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex flex-wrap gap-1.5">
+                    {activeProject.categories.map((cat) => (
+                      <span
+                        key={cat}
+                        className={`px-2 py-0.5 rounded-full font-label text-[8px] uppercase tracking-[0.25em] ${mutedToneClass}`}
+                        style={{
+                          background:
+                            activeProject.mood.text === "dark"
+                              ? "rgba(0,0,0,0.08)"
+                              : "rgba(255,255,255,0.08)",
+                          border: `1px solid ${
+                            activeProject.mood.text === "dark"
+                              ? "rgba(0,0,0,0.12)"
+                              : "rgba(255,255,255,0.12)"
+                          }`,
+                        }}
+                      >
+                        {cat}
+                      </span>
+                    ))}
+                  </div>
+                  <span className={`font-headline font-black text-2xl leading-none ${mutedToneClass}`}>
+                    {String(activeIndex + 1).padStart(2, "0")}
                   </span>
-                ))}
+                </div>
+
+                {/* Title */}
+                <h2
+                  className={`font-headline font-black uppercase leading-[0.9] tracking-tight ${toneClass}`}
+                  style={{ fontSize: "clamp(1.8rem,4vw,3rem)" }}
+                >
+                  {activeProject.title}
+                </h2>
+
+                {/* URL row */}
+                <a
+                  href={activeProject.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`mt-3 inline-flex items-center gap-1.5 font-label text-[9px] uppercase tracking-[0.22em] transition-opacity hover:opacity-70 ${mutedToneClass}`}
+                >
+                  <span
+                    className="inline-block w-1 h-1 rounded-full"
+                    style={{ background: activeProject.mood.accent }}
+                  />
+                  {activeProject.displayUrl}
+                  <ArrowUpRight size={11} strokeWidth={2} aria-hidden="true" />
+                </a>
+
+                {/* Divider */}
+                <div
+                  className="my-4 h-px w-full"
+                  style={{
+                    background:
+                      activeProject.mood.text === "dark"
+                        ? "rgba(0,0,0,0.1)"
+                        : "rgba(255,255,255,0.1)",
+                  }}
+                />
+
+                {/* Tech tags */}
+                <div className="flex flex-wrap gap-1.5">
+                  {activeProject.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className={`px-2 py-0.5 font-label text-[8px] uppercase tracking-[0.15em] ${mutedToneClass}`}
+                      style={{
+                        background:
+                          activeProject.mood.text === "dark"
+                            ? "rgba(0,0,0,0.06)"
+                            : "rgba(255,255,255,0.06)",
+                        border: `1px solid ${
+                          activeProject.mood.text === "dark"
+                            ? "rgba(0,0,0,0.1)"
+                            : "rgba(255,255,255,0.1)"
+                        }`,
+                      }}
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+
+                {/* CTA */}
+                <a
+                  href={activeProject.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-4 inline-flex items-center gap-2 rounded-lg px-4 py-2 font-label text-[9px] uppercase tracking-[0.2em] font-bold transition-all hover:scale-[1.03]"
+                  style={{
+                    background: activeProject.mood.accent,
+                    color:
+                      activeProject.mood.text === "light" ? "#fff" : "#000",
+                    boxShadow: `0 0 20px ${activeProject.mood.accent}55`,
+                  }}
+                >
+                  View Live
+                  <ExternalLink size={11} strokeWidth={2} aria-hidden="true" />
+                </a>
               </div>
             </article>
           </div>
         </div>
 
+        {/* Progress bar */}
         <div className="pointer-events-none absolute bottom-0 left-0 right-0 z-30 h-px bg-white/10">
           <div className="depth-gallery__progress h-full origin-left bg-white/80" />
         </div>
