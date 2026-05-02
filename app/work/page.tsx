@@ -1,7 +1,7 @@
 "use client";
 
-import { FeaturedWork } from "@/components/sections/FeaturedWork";
+import { DepthProjectGallery } from "@/components/sections/DepthProjectGallery";
 
 export default function WorkPage() {
-  return <FeaturedWork />;
+  return <DepthProjectGallery />;
 }

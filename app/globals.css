@@ -65,6 +65,52 @@ body {
   cursor: crosshair;
 }
 
+.depth-gallery {
+  --depth-bg: #f6fbff;
+  --depth-blob-1: #00d9ff;
+  --depth-blob-2: #88d6a6;
+  --depth-progress: 0;
+  --depth-velocity: 0;
+  background: var(--depth-bg);
+  isolation: isolate;
+}
+
+.depth-gallery::before,
+.depth-gallery::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.depth-gallery::before {
+  z-index: 0;
+  background:
+    radial-gradient(circle at 18% 30%, color-mix(in srgb, var(--depth-blob-1) 78%, transparent) 0, transparent 34%),
+    radial-gradient(circle at 78% 62%, color-mix(in srgb, var(--depth-blob-2) 76%, transparent) 0, transparent 38%),
+    linear-gradient(135deg, color-mix(in srgb, var(--depth-bg) 88%, #ffffff 12%), color-mix(in srgb, var(--depth-bg) 76%, #000000 24%));
+  filter: saturate(calc(1 + (var(--depth-velocity) * 0.25))) brightness(calc(1 + (var(--depth-velocity) * 0.1)));
+  transform: scale(calc(1 + (var(--depth-velocity) * 0.025)));
+  transition: background 220ms linear;
+}
+
+.depth-gallery::after {
+  z-index: 1;
+  opacity: 0.2;
+  background-image:
+    repeating-radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.18) 0 1px, transparent 1px 3px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.18), transparent 24%, rgba(0, 0, 0, 0.28));
+  mix-blend-mode: soft-light;
+}
+
+.depth-gallery__progress {
+  transform: scaleX(var(--depth-progress));
+}
+
+.depth-gallery canvas {
+  touch-action: none;
+}
+
 
 /* Custom Utilities */
 @layer utilities {
