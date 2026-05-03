@@ -513,6 +513,7 @@ export function DepthProjectGallery() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const scrollToProjectRef = useRef<(index: number) => void>(() => {});
   const activeIndexRef = useRef(0);
+  const debouncedIndexTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [isReady, setIsReady] = useState(false);
   const [hasWebGL, setHasWebGL] = useState(true);
@@ -522,9 +523,9 @@ export function DepthProjectGallery() {
   const toneClass =
     activeProject.mood.text === "dark" ? "text-black" : "text-white";
   const mutedToneClass =
-    activeProject.mood.text === "dark" ? "text-black/55" : "text-white/55";
+    activeProject.mood.text === "dark" ? "text-black/85" : "text-white/85";
   const borderToneClass =
-    activeProject.mood.text === "dark" ? "border-black/15" : "border-white/15";
+    activeProject.mood.text === "dark" ? "border-black/25" : "border-white/25";
 
   const selectProject = useCallback((index: number) => {
     scrollToProjectRef.current(index);
@@ -789,7 +790,13 @@ export function DepthProjectGallery() {
 
       if (nearestIndex !== activeIndexRef.current) {
         activeIndexRef.current = nearestIndex;
-        setActiveIndex(nearestIndex);
+        // Debounce the UI switch — user must dwell for 450ms before the info panel updates
+        if (debouncedIndexTimerRef.current) {
+          clearTimeout(debouncedIndexTimerRef.current);
+        }
+        debouncedIndexTimerRef.current = setTimeout(() => {
+          setActiveIndex(nearestIndex);
+        }, 450);
       }
 
       renderer.clear();
@@ -815,6 +822,9 @@ export function DepthProjectGallery() {
         video.querySelectorAll("source").forEach((source) => source.remove());
         video.load();
       });
+      if (debouncedIndexTimerRef.current) {
+        clearTimeout(debouncedIndexTimerRef.current);
+      }
       materials.forEach((material) => material.dispose());
       textures.forEach((texture) => texture.dispose());
       geometry.dispose();
@@ -905,7 +915,7 @@ export function DepthProjectGallery() {
           <div className="flex-1" />
 
           {/* Bottom area: nav left + info right */}
-          <div className="grid gap-7 lg:grid-cols-[minmax(190px,240px)_1fr_minmax(340px,480px)]">
+          <div className="flex items-end justify-between gap-7">
 
             {/* ── PROJECT NAV (desktop only) */}
             <nav
@@ -933,8 +943,6 @@ export function DepthProjectGallery() {
               </div>
             </nav>
 
-            <div className="hidden lg:block" />
-
             {/* ── PROJECT INFO PANEL (redesigned) */}
             <article
               className={`pointer-events-auto depth-gallery__info-panel`}
@@ -946,16 +954,16 @@ export function DepthProjectGallery() {
                 style={{
                   background:
                     activeProject.mood.text === "dark"
-                      ? "rgba(255,255,255,0.12)"
-                      : "rgba(0,0,0,0.35)",
-                  backdropFilter: "blur(20px) saturate(1.4)",
-                  WebkitBackdropFilter: "blur(20px) saturate(1.4)",
+                      ? "rgba(255,255,255,0.25)"
+                      : "rgba(0,0,0,0.45)",
+                  backdropFilter: "blur(24px) saturate(1.6)",
+                  WebkitBackdropFilter: "blur(24px) saturate(1.6)",
                   border: `1px solid ${
                     activeProject.mood.text === "dark"
-                      ? "rgba(0,0,0,0.1)"
-                      : "rgba(255,255,255,0.12)"
+                      ? "rgba(0,0,0,0.15)"
+                      : "rgba(255,255,255,0.2)"
                   }`,
-                  boxShadow: "0 8px 40px rgba(0,0,0,0.3)",
+                  boxShadow: "0 12px 48px rgba(0,0,0,0.4)",
                 }}
               >
                 {/* Accent bar */}
@@ -976,12 +984,12 @@ export function DepthProjectGallery() {
                         style={{
                           background:
                             activeProject.mood.text === "dark"
-                              ? "rgba(0,0,0,0.08)"
-                              : "rgba(255,255,255,0.08)",
+                              ? "rgba(0,0,0,0.12)"
+                              : "rgba(255,255,255,0.12)",
                           border: `1px solid ${
                             activeProject.mood.text === "dark"
-                              ? "rgba(0,0,0,0.12)"
-                              : "rgba(255,255,255,0.12)"
+                              ? "rgba(0,0,0,0.18)"
+                              : "rgba(255,255,255,0.18)"
                           }`,
                         }}
                       >
