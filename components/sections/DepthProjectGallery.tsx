@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ExternalLink, ArrowUpRight } from "lucide-react";
 import * as THREE from "three";
 import dynamic from "next/dynamic";
+import { MobileImageStackGrid } from "@/components/ui/MobileImageStackGrid";
 
 const ShaderGradientWithNoSSR = dynamic(
   () =>
@@ -840,6 +841,10 @@ export function DepthProjectGallery() {
       })),
     []
   );
+
+  if (mediaMode === "compact") {
+    return <MobileImageStackGrid projects={PROJECTS} />;
+  }
 
   return (
     <section
