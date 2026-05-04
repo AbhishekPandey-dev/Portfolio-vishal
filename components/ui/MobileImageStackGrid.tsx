@@ -1,235 +1,280 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ArrowUpRight } from "lucide-react";
 
 gsap.registerPlugin(ScrollTrigger);
 
-export function MobileImageStackGrid({ projects }: { projects: any[] }) {
+// Custom interface assuming typical project structure based on previous usage
+interface Project {
+  title: string;
+  url: string;
+  displayUrl?: string;
+  categories: string[];
+  tags: string[];
+  media: { image: string };
+  mood: {
+    text: "dark" | "light";
+    background: string;
+    blob1: string;
+    blob2: string;
+    accent: string;
+  };
+}
+
+export function MobileImageStackGrid({ projects }: { projects: Project[] }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const itemsRef = useRef<(HTMLDivElement | null)[]>([]);
+  const [isReady, setIsReady] = useState(false);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!containerRef.current) return;
     
-    const items = itemsRef.current.filter(Boolean);
-    const cx = window.innerWidth / 2;
-    const cy = window.innerHeight / 2;
+    const items = itemsRef.current.filter(Boolean) as HTMLDivElement[];
+    if (items.length === 0) return;
 
-    const tl = gsap.timeline({ delay: 0.2 });
+    let ctx = gsap.context(() => {
+      // Step 1: Hide everything initially to prevent FOUC
+      gsap.set(items, { opacity: 0 });
+      
+      // Step 2: Ensure layout calculates correctly before starting animations
+      requestAnimationFrame(() => {
+        setIsReady(true);
+        const cx = window.innerWidth / 2;
+        const cy = window.innerHeight / 2;
+        const scrollY = window.scrollY || window.pageYOffset;
+        
+        const tl = gsap.timeline({ 
+          delay: 0.1,
+          defaults: { ease: "power4.out" } 
+        });
 
-    // Initial positioning: stack them in the center of the viewport
-    setTimeout(() => {
-      items.forEach((item, i) => {
-        if (!item) return;
-        const imgWrapper = item.querySelector(".img-wrapper");
-        const info = item.querySelector(".project-info");
-        if (!imgWrapper || !info) return;
+        // Step 3: Position the first 5 items tightly in the center of the viewport
+        const stackItems = items.slice(0, 5);
+        
+        stackItems.forEach((item, i) => {
+          const rect = item.getBoundingClientRect();
+          const itemCx = rect.left + rect.width / 2;
+          const itemCy = rect.top + scrollY + rect.height / 2;
+          
+          const dx = cx - itemCx;
+          const dy = (cy + scrollY) - itemCy;
 
-        if (i <= 5) {
-          const rect = imgWrapper.getBoundingClientRect();
-          const scrollY = window.scrollY || window.pageYOffset;
-          const dx = cx - (rect.left + rect.width / 2);
-          const dy = (cy + scrollY) - (rect.top + scrollY + rect.height / 2);
-
-          gsap.set(imgWrapper, {
+          gsap.set(item, {
             x: dx,
             y: dy,
-            rotation: i === 0 ? 0 : Math.random() * 20 - 10,
-            scale: i === 0 ? 1.05 : 0.9,
+            rotation: i === 0 ? 0 : (Math.random() * 16 - 8),
+            scale: 1 - (i * 0.05), // slightly smaller as they go back
             opacity: 1,
-            zIndex: 100 - i
+            zIndex: 100 - i,
+            transformOrigin: "center center"
           });
-        } else {
-          gsap.set(imgWrapper, { opacity: 1, scale: 1 });
+          
+          // Hide info cards initially
+          const info = item.querySelector(".project-info");
+          if (info) gsap.set(info, { opacity: 0, y: 30 });
+        });
+
+        // Set remaining items to their normal flow positions, but hidden
+        const remainingItems = items.slice(5);
+        if (remainingItems.length > 0) {
+          gsap.set(remainingItems, { opacity: 0, y: 100, scale: 0.95 });
         }
-        gsap.set(info, { opacity: 0, y: 20 });
-      });
 
-      const stackItems = items.slice(0, 6);
-      const otherItems = stackItems.slice(1);
-      const firstItem = stackItems[0];
-      const firstImg = firstItem?.querySelector(".img-wrapper");
+        // Step 4: The Burst Animation
+        // "Deal" the cards out to their actual layout positions
+        tl.to(stackItems, {
+          duration: 1.2,
+          x: 0,
+          y: 0,
+          rotation: 0,
+          scale: 1,
+          ease: "expo.inOut",
+          stagger: 0.05,
+          clearProps: "zIndex,transformOrigin" // Keep transforms clean after intro
+        }, 0.2);
 
-      const otherImgs = otherItems.map(item => item?.querySelector(".img-wrapper")).filter(Boolean);
-      
-      // Intro animation timeline: Burst effect
-      tl.to(otherImgs, {
-        duration: 0.6,
-        ease: "power3.inOut",
-        x: () => `+=${Math.random() * 120 - 60}`,
-        y: () => `+=${Math.random() * 120 - 60}`,
-        rotation: () => Math.random() * 40 - 20,
-      }, 0.1)
-      .to(otherImgs, {
-        duration: 1.0,
-        ease: "power4.inOut",
-        x: 0,
-        y: 0,
-        scale: 1,
-        rotation: 0,
-        clearProps: "zIndex,transform"
-      }, 0.7)
-      .to(firstImg, {
-        duration: 1.0,
-        ease: "power4.inOut",
-        x: 0,
-        y: 0,
-        scale: 1,
-        clearProps: "zIndex,transform"
-      }, 0.7)
-      .to(items.map(item => item?.querySelector(".project-info")), {
-        duration: 0.8,
-        opacity: 1,
-        y: 0,
-        stagger: 0.05,
-        ease: "power2.out"
-      }, 1.2);
-    }, 100);
-
-    // Scroll Animations
-    items.forEach((item) => {
-      if (!item) return;
-      const img = item.querySelector("img");
-      const wrapper = item.querySelector(".img-wrapper");
-      if (!img || !wrapper) return;
-      
-      gsap.fromTo(
-        img,
-        { scale: 1.25, yPercent: -15 },
-        {
-          scale: 1.05,
-          yPercent: 15,
-          ease: "none",
-          scrollTrigger: {
-            trigger: wrapper,
-            start: "top bottom",
-            end: "bottom top",
-            scrub: true,
-          },
+        // Reveal the remaining items as they scroll into view (or immediately if visible)
+        if (remainingItems.length > 0) {
+          tl.to(remainingItems, {
+            duration: 1,
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            ease: "power3.out",
+            stagger: 0.1
+          }, 0.8);
         }
-      );
-      
-      gsap.fromTo(
-        wrapper,
-        { rotationX: 10, rotationY: 5, z: -50 },
-        {
-          rotationX: 0, rotationY: 0, z: 0,
-          ease: "power2.out",
-          scrollTrigger: {
-            trigger: item,
-            start: "top bottom-=10%",
-            end: "center center",
-            scrub: true,
+
+        // Fade in the info cards with a slight bounce
+        tl.to(".project-info", {
+          duration: 0.8,
+          opacity: 1,
+          y: 0,
+          ease: "back.out(1.2)",
+          stagger: 0.08
+        }, 1.0);
+
+        // Step 5: Setup ScrollTrigger Parallax & Reveal Effects
+        items.forEach((item) => {
+          const img = item.querySelector("img");
+          const info = item.querySelector(".project-info");
+          
+          if (img) {
+            // Smooth parallax on the image with increased inertia (scrub: 1.5)
+            gsap.fromTo(img,
+              { yPercent: -20, scale: 1.2 },
+              {
+                yPercent: 20,
+                scale: 1.05,
+                ease: "none",
+                scrollTrigger: {
+                  trigger: item,
+                  start: "top bottom",
+                  end: "bottom top",
+                  scrub: 1.5,
+                  fastScrollEnd: true
+                }
+              }
+            );
           }
-        }
-      );
-    });
 
-    return () => {
-      ScrollTrigger.getAll().forEach((t) => t.kill());
-      tl.kill();
-    };
+          // More pronounced 3D tilt effect with even higher delay (scrub: 2)
+          gsap.fromTo(item,
+            { rotationX: 12, rotationY: 4, z: -80, opacity: 0.7 },
+            {
+              rotationX: 0, rotationY: 0, z: 0, opacity: 1,
+              ease: "power2.out",
+              scrollTrigger: {
+                trigger: item,
+                start: "top bottom-=5%",
+                end: "center center+=10%",
+                scrub: 2,
+                fastScrollEnd: true
+              }
+            }
+          );
+        });
+      });
+    }, containerRef); // Scope everything to containerRef!
+
+    return () => ctx.revert(); // Flawless cleanup
   }, []);
 
   return (
-    <div ref={containerRef} className="relative w-full min-h-screen bg-[#0a0a0a] text-white pt-[120px] pb-24 overflow-hidden z-50">
-      <div className="px-6 mb-20 text-center relative z-10">
-        <p className="font-label text-[10px] uppercase tracking-[0.35em] text-white/60 mb-3">
+    <div ref={containerRef} className="relative w-full min-h-screen bg-[#0a0a0a] text-white pt-[120px] pb-32 overflow-hidden z-50">
+      {/* Header Section */}
+      <div className="px-6 mb-16 text-center relative z-10">
+        <p className="font-label text-[10px] uppercase tracking-[0.35em] text-white/50 mb-3">
           Work Index
         </p>
-        <h1 className="font-headline text-5xl font-black uppercase leading-[0.9] tracking-tight bg-clip-text text-transparent bg-gradient-to-b from-white to-white/60">
+        <h1 className="font-headline text-[2.75rem] font-black uppercase leading-[0.9] tracking-tight bg-clip-text text-transparent bg-gradient-to-b from-white to-white/40">
           Selected Builds
         </h1>
       </div>
 
-      <div className="flex flex-col gap-32 px-6 relative z-10" style={{ perspective: "1000px" }}>
+      {/* Projects Grid */}
+      <div 
+        className="flex flex-col gap-16 px-5 relative z-10" 
+        style={{ perspective: "1200px" }}
+      >
         {projects.map((project, index) => {
           const isDark = project.mood.text === "dark";
           const toneClass = isDark ? "text-black" : "text-white";
           const mutedClass = isDark ? "text-black/70" : "text-white/70";
+          const borderColor = isDark ? "rgba(0,0,0,0.1)" : "rgba(255,255,255,0.15)";
           
           return (
             <article
               key={project.title}
-              ref={(el) => {
-                itemsRef.current[index] = el;
+              ref={(el) => { itemsRef.current[index] = el; }}
+              className="group relative w-full aspect-[4/5] max-h-[650px] rounded-[2rem] overflow-hidden will-change-transform"
+              style={{ 
+                backgroundColor: project.mood.background,
+                boxShadow: `0 30px 60px -20px ${project.mood.background}40, 0 0 40px 0 ${project.mood.accent}15`,
+                // Make opacity 0 initially to avoid FOUC before useLayoutEffect kicks in
+                opacity: isReady ? 1 : 0, 
+                visibility: isReady ? "visible" : "hidden"
               }}
-              className="relative flex flex-col gap-6"
             >
+              {/* Animated Background Mesh */}
               <div 
-                className="img-wrapper relative aspect-[4/5] w-full rounded-3xl overflow-hidden shadow-2xl origin-center will-change-transform border border-white/10"
-                style={{ 
-                  backgroundColor: project.mood.background,
-                  boxShadow: `0 20px 60px -15px ${project.mood.background}40, 0 0 20px 0 ${project.mood.accent}20`
-                }}
-              >
-                <div 
-                  className="absolute inset-0 opacity-50 mix-blend-overlay z-10 pointer-events-none"
-                  style={{ background: `linear-gradient(45deg, ${project.mood.blob1}, ${project.mood.blob2})`}}
-                />
+                className="absolute inset-0 opacity-60 mix-blend-overlay z-0 pointer-events-none"
+                style={{ background: `linear-gradient(135deg, ${project.mood.blob1}, ${project.mood.blob2})`}}
+              />
+              
+              {/* Parallax Image */}
+              <div className="absolute inset-0 z-0 overflow-hidden rounded-[2rem]">
                 <img
                   src={project.media.image}
                   alt={project.title}
-                  className="absolute inset-0 w-full h-full object-cover transform-gpu"
+                  className="w-full h-full object-cover transform-gpu"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/10 z-10 pointer-events-none" />
               </div>
+              
+              {/* Beautiful Scrim / Vignette for text readability */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10 pointer-events-none" />
 
-              <div 
-                className="project-info relative rounded-3xl p-7 -mt-24 mx-4 z-20 shadow-xl will-change-transform"
-                style={{
-                  background: isDark ? "rgba(255,255,255,0.85)" : "rgba(20,20,20,0.85)",
-                  backdropFilter: "blur(20px) saturate(1.5)",
-                  WebkitBackdropFilter: "blur(20px) saturate(1.5)",
-                  border: `1px solid ${isDark ? "rgba(0,0,0,0.1)" : "rgba(255,255,255,0.15)"}`
-                }}
-              >
+              {/* Floating Glassmorphic Info Card */}
+              <div className="absolute bottom-4 left-4 right-4 z-20">
                 <div 
-                  className="absolute top-0 left-0 w-full h-[2px] rounded-t-3xl overflow-hidden" 
-                  style={{ background: `linear-gradient(90deg, ${project.mood.accent}, transparent)` }} 
-                />
+                  className="project-info rounded-[1.5rem] p-6 shadow-2xl transition-transform duration-300 active:scale-[0.98]"
+                  style={{
+                    background: isDark ? "rgba(255,255,255,0.85)" : "rgba(20,20,20,0.85)",
+                    backdropFilter: "blur(24px) saturate(1.6)",
+                    WebkitBackdropFilter: "blur(24px) saturate(1.6)",
+                    border: `1px solid ${borderColor}`
+                  }}
+                >
+                  {/* Glowing Top Border */}
+                  <div 
+                    className="absolute top-0 left-0 w-full h-[2px] rounded-t-[1.5rem] overflow-hidden" 
+                    style={{ background: `linear-gradient(90deg, ${project.mood.accent}, transparent)` }} 
+                  />
 
-                <div className="flex justify-between items-center mb-5">
-                  <div className="flex flex-wrap gap-2">
-                    {project.categories.map((cat: string) => (
-                      <span key={cat} className={`px-2.5 py-1 rounded-full font-label text-[9px] uppercase tracking-[0.25em] ${mutedClass} border ${isDark ? "border-black/10 bg-black/5" : "border-white/10 bg-white/5"}`}>
-                        {cat}
+                  {/* Meta Details */}
+                  <div className="flex justify-between items-center mb-4">
+                    <div className="flex flex-wrap gap-1.5">
+                      {project.categories.slice(0, 2).map((cat: string) => (
+                        <span key={cat} className={`px-2.5 py-1 rounded-full font-label text-[8px] uppercase tracking-[0.25em] ${mutedClass} border ${borderColor}`}>
+                          {cat}
+                        </span>
+                      ))}
+                    </div>
+                    <span className={`font-headline font-black text-xl ${mutedClass} opacity-60 tabular-nums`}>
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+                  </div>
+
+                  {/* Title */}
+                  <h2 className={`font-headline text-3xl font-black uppercase leading-[0.9] tracking-tight mb-4 ${toneClass}`}>
+                    {project.title}
+                  </h2>
+
+                  {/* Tech Stack Tags */}
+                  <div className="flex flex-wrap gap-1.5 mb-6">
+                    {project.tags.slice(0, 4).map((tag: string) => (
+                      <span key={tag} className={`px-2 py-0.5 font-label text-[8px] uppercase tracking-[0.15em] ${mutedClass} bg-black/5 dark:bg-white/5 rounded-md`}>
+                        {tag}
                       </span>
                     ))}
                   </div>
-                  <span className={`font-headline font-black text-2xl ${mutedClass} opacity-50`}>
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
-                </div>
 
-                <h2 className={`font-headline text-4xl font-black uppercase leading-[0.9] tracking-tight mb-5 ${toneClass}`}>
-                  {project.title}
-                </h2>
-
-                <div className="flex flex-wrap gap-1.5 mb-8">
-                  {project.tags.map((tag: string) => (
-                    <span key={tag} className={`px-2 py-0.5 font-label text-[9px] uppercase tracking-[0.15em] ${mutedClass} bg-black/5 dark:bg-white/5 rounded-md`}>
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-
-                <div className="flex items-center gap-4">
+                  {/* CTA Button */}
                   <a
                     href={project.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex-1 inline-flex justify-center items-center gap-2 rounded-xl px-5 py-3.5 font-label text-[11px] uppercase tracking-[0.2em] font-bold transition-all active:scale-[0.98]"
+                    className="w-full inline-flex justify-center items-center gap-2 rounded-xl px-5 py-4 font-label text-[10px] uppercase tracking-[0.2em] font-bold transition-all hover:opacity-90 active:scale-[0.96]"
                     style={{
                       background: project.mood.accent,
                       color: project.mood.text === "light" ? "#fff" : "#000",
-                      boxShadow: `0 4px 14px ${project.mood.accent}40`
+                      boxShadow: `0 8px 24px ${project.mood.accent}40`
                     }}
                   >
-                    View Project
+                    Explore Case Study
                     <ArrowUpRight size={14} strokeWidth={2.5} />
                   </a>
                 </div>
