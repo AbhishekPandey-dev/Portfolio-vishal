@@ -79,7 +79,7 @@ export function Navigation() {
             exit={{ y: -100, opacity: 0 }}
             transition={{ duration: 0.6, ease: [0.33, 1, 0.68, 1] }}
             className={cn(
-              "fixed top-0 w-full z-[60] flex justify-between items-center px-6 py-4 md:py-8 md:px-12 pointer-events-none transition-all duration-500",
+              "fixed top-0 w-full z-[100] flex justify-between items-center px-6 py-4 md:py-8 md:px-12 pointer-events-none transition-all duration-500",
               !isOpen && "bg-[#050505]/40 backdrop-blur-md border-b border-white/[0.05] md:bg-transparent md:backdrop-blur-none md:border-none md:mix-blend-difference"
             )}
           >
@@ -112,7 +112,7 @@ export function Navigation() {
             animate={{ y: "0%" }}
             exit={{ y: "-100%" }}
             transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1] }}
-            className="fixed inset-0 z-[50] bg-[#050505] text-white px-6 py-6 md:px-12 flex flex-col overflow-hidden"
+            className="fixed inset-0 z-[90] bg-[#050505] text-white px-6 py-6 md:px-12 flex flex-col overflow-hidden"
           >
             {/* Background Vertical Grid Lines (Matched to Footer + Animated Scanline) */}
             <div className="absolute inset-x-4 md:inset-x-12 inset-y-0 pointer-events-none flex justify-between z-0">

@@ -262,9 +262,9 @@ export function MobileImageStackGrid({ projects }: { projects: Project[] }) {
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent z-10 pointer-events-none" />
 
               {/* Floating Glassmorphic Info Card */}
-              <div className="absolute bottom-6 left-6 right-6 z-20">
+              <div className="absolute bottom-3 left-3 right-3 md:bottom-6 md:left-6 md:right-6 z-20">
                 <div 
-                  className="project-info rounded-[1.8rem] p-6 shadow-2xl transition-all duration-300 active:scale-[0.98] active:brightness-95"
+                  className="project-info rounded-[1.5rem] md:rounded-[1.8rem] p-3.5 md:p-6 shadow-2xl transition-all duration-300 active:scale-[0.98] active:brightness-95"
                   style={{
                     background: isDark ? "rgba(255,255,255,0.9)" : "rgba(15,15,15,0.9)",
                     backdropFilter: "blur(32px) saturate(1.8)",
@@ -273,55 +273,105 @@ export function MobileImageStackGrid({ projects }: { projects: Project[] }) {
                     boxShadow: `0 20px 40px -10px rgba(0,0,0,0.5), 0 0 20px 0 ${project.mood.accent}20`
                   }}
                 >
-                  {/* Glowing Top Border */}
+                  {/* Glowing Top Border (Desktop only) */}
                   <div 
-                    className="absolute top-0 left-0 w-full h-[3px] rounded-t-[1.8rem] overflow-hidden" 
+                    className="hidden md:block absolute top-0 left-0 w-full h-[3px] rounded-t-[1.8rem] overflow-hidden" 
                     style={{ background: `linear-gradient(90deg, ${project.mood.accent}, transparent, ${project.mood.accent})` }} 
                   />
 
-                  {/* Meta Details */}
-                  <div className="flex justify-between items-center mb-5">
-                    <div className="flex flex-wrap gap-2">
-                      {project.categories.slice(0, 2).map((cat: string) => (
-                        <span key={cat} className={`px-3 py-1 rounded-full font-label text-[9px] uppercase tracking-[0.25em] ${mutedClass} border ${borderColor} backdrop-blur-sm`}>
-                          {cat}
+                  {/* --- MOBILE VIEW (Compact Detail Card) --- */}
+                  <div className="flex md:hidden flex-col gap-3">
+                    {/* Top Row: Title & CTA */}
+                    <div className="flex items-start justify-between gap-3">
+                      <h2 className={`font-headline text-[1.2rem] font-black uppercase leading-[1.1] tracking-tight ${toneClass} line-clamp-2 pt-0.5`}>
+                        {project.title}
+                      </h2>
+                      
+                      <a
+                        href={project.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-full transition-all active:scale-[0.9] shadow-md"
+                        style={{
+                          background: project.mood.accent,
+                          color: project.mood.text === "light" ? "#fff" : "#000",
+                          boxShadow: `0 4px 12px ${project.mood.accent}40`
+                        }}
+                      >
+                        <ArrowUpRight size={16} strokeWidth={2.5} />
+                      </a>
+                    </div>
+
+                    {/* Bottom Row: Index, Category & Tech Stack */}
+                    <div className="flex items-center flex-wrap gap-2">
+                      <div className="flex items-center gap-1.5 mr-1">
+                        <span className={`font-headline font-bold text-[10px] ${mutedClass} opacity-60 tabular-nums`}>
+                          {String(index + 1).padStart(2, "0")}
+                        </span>
+                        {project.categories[0] && (
+                          <>
+                            <div className={`h-[3px] w-[3px] rounded-full ${mutedClass} opacity-40`} style={{ backgroundColor: "currentColor" }} />
+                            <span className={`font-label text-[8px] uppercase tracking-[0.2em] ${mutedClass}`}>
+                              {project.categories[0]}
+                            </span>
+                          </>
+                        )}
+                      </div>
+
+                      {project.tags.slice(0, 3).map((tag: string) => (
+                        <span key={tag} className={`px-2 py-[3px] font-label text-[7px] uppercase tracking-[0.15em] ${mutedClass} bg-black/5 dark:bg-white/5 rounded-md border ${borderColor}`}>
+                          {tag}
                         </span>
                       ))}
                     </div>
-                    <span className={`font-headline font-black text-2xl ${mutedClass} opacity-40 tabular-nums`}>
-                      {String(index + 1).padStart(2, "0")}
-                    </span>
                   </div>
 
-                  {/* Title */}
-                  <h2 className={`font-headline text-[2.25rem] font-black uppercase leading-[0.85] tracking-tight mb-5 ${toneClass}`}>
-                    {project.title}
-                  </h2>
-
-                  {/* Tech Stack Tags */}
-                  <div className="flex flex-wrap gap-1.5 mb-8">
-                    {project.tags.slice(0, 4).map((tag: string) => (
-                      <span key={tag} className={`px-2.5 py-1 font-label text-[8px] uppercase tracking-[0.15em] ${mutedClass} bg-black/5 dark:bg-white/5 rounded-lg border ${borderColor}`}>
-                        {tag}
+                  {/* --- DESKTOP VIEW --- */}
+                  <div className="hidden md:block">
+                    {/* Meta Details */}
+                    <div className="flex justify-between items-center mb-5">
+                      <div className="flex flex-wrap gap-2">
+                        {project.categories.slice(0, 2).map((cat: string) => (
+                          <span key={cat} className={`px-3 py-1 rounded-full font-label text-[9px] uppercase tracking-[0.25em] ${mutedClass} border ${borderColor} backdrop-blur-sm`}>
+                            {cat}
+                          </span>
+                        ))}
+                      </div>
+                      <span className={`font-headline font-black text-2xl ${mutedClass} opacity-40 tabular-nums`}>
+                        {String(index + 1).padStart(2, "0")}
                       </span>
-                    ))}
-                  </div>
+                    </div>
 
-                  {/* CTA Button */}
-                  <a
-                    href={project.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full inline-flex justify-center items-center gap-3 rounded-2xl px-6 py-5 font-label text-[11px] uppercase tracking-[0.25em] font-black transition-all hover:brightness-110 active:scale-[0.96] overflow-hidden group/btn"
-                    style={{
-                      background: project.mood.accent,
-                      color: project.mood.text === "light" ? "#fff" : "#000",
-                      boxShadow: `0 12px 28px ${project.mood.accent}40`
-                    }}
-                  >
-                    View Project
-                    <ArrowUpRight size={16} strokeWidth={3} className="transition-transform group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1" />
-                  </a>
+                    {/* Title */}
+                    <h2 className={`font-headline text-[2.25rem] font-black uppercase leading-[0.85] tracking-tight mb-5 ${toneClass}`}>
+                      {project.title}
+                    </h2>
+
+                    {/* Tech Stack Tags */}
+                    <div className="flex flex-wrap gap-1.5 mb-8">
+                      {project.tags.slice(0, 4).map((tag: string) => (
+                        <span key={tag} className={`px-2.5 py-1 font-label text-[8px] uppercase tracking-[0.15em] ${mutedClass} bg-black/5 dark:bg-white/5 rounded-lg border ${borderColor}`}>
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+
+                    {/* CTA Button */}
+                    <a
+                      href={project.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full inline-flex justify-center items-center gap-3 rounded-2xl px-6 py-5 font-label text-[11px] uppercase tracking-[0.25em] font-black transition-all hover:brightness-110 active:scale-[0.96] overflow-hidden group/btn"
+                      style={{
+                        background: project.mood.accent,
+                        color: project.mood.text === "light" ? "#fff" : "#000",
+                        boxShadow: `0 12px 28px ${project.mood.accent}40`
+                      }}
+                    >
+                      View Project
+                      <ArrowUpRight size={16} strokeWidth={3} className="transition-transform group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1" />
+                    </a>
+                  </div>
                 </div>
               </div>
             </article>
