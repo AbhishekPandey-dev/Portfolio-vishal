@@ -26,13 +26,13 @@ interface Project {
 
 export function MobileImageStackGrid({ projects }: { projects: Project[] }) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const itemsRef = useRef<(HTMLDivElement | null)[]>([]);
+  const itemsRef = useRef<(HTMLElement | null)[]>([]);
   const [isReady, setIsReady] = useState(false);
 
   useLayoutEffect(() => {
     if (!containerRef.current) return;
     
-    const items = itemsRef.current.filter(Boolean) as HTMLDivElement[];
+    const items = itemsRef.current.filter(Boolean) as HTMLElement[];
     if (items.length === 0) return;
 
     let ctx = gsap.context(() => {
@@ -123,39 +123,84 @@ export function MobileImageStackGrid({ projects }: { projects: Project[] }) {
           const info = item.querySelector(".project-info");
           
           if (img) {
-            // Smooth parallax on the image with increased inertia (scrub: 1.5)
+            // Smooth parallax on the image with high inertia (scrub: 1.8)
             gsap.fromTo(img,
-              { yPercent: -20, scale: 1.2 },
+              { yPercent: -15, scale: 1.15 },
               {
-                yPercent: 20,
+                yPercent: 15,
                 scale: 1.05,
                 ease: "none",
                 scrollTrigger: {
                   trigger: item,
                   start: "top bottom",
                   end: "bottom top",
-                  scrub: 1.5,
+                  scrub: 1.8,
                   fastScrollEnd: true
                 }
               }
             );
           }
 
-          // More pronounced 3D tilt effect with even higher delay (scrub: 2)
+          // Liquid 3D tilt effect with deep delay (scrub: 2.2)
           gsap.fromTo(item,
-            { rotationX: 12, rotationY: 4, z: -80, opacity: 0.7 },
+            { 
+              rotationX: 10, 
+              rotationY: 2, 
+              z: -60, 
+              opacity: 0.8,
+              skewY: 2 
+            },
             {
-              rotationX: 0, rotationY: 0, z: 0, opacity: 1,
+              rotationX: 0, 
+              rotationY: 0, 
+              z: 0, 
+              opacity: 1,
+              skewY: 0,
               ease: "power2.out",
               scrollTrigger: {
                 trigger: item,
-                start: "top bottom-=5%",
-                end: "center center+=10%",
-                scrub: 2,
+                start: "top bottom-=10%",
+                end: "center center+=20%",
+                scrub: 2.2,
                 fastScrollEnd: true
               }
             }
           );
+
+          // Secondary Parallax for Info Card (Depth Layering)
+          if (info) {
+            gsap.to(info, {
+              y: -50,
+              ease: "none",
+              scrollTrigger: {
+                trigger: item,
+                start: "top bottom",
+                end: "bottom top",
+                scrub: 1.2
+              }
+            });
+          }
+        });
+
+        // Step 6: Global Velocity-based Skew (The "Delayed Scroll" secret)
+        let proxy = { skew: 0 };
+        let setSkew = gsap.quickSetter(items, "skewY", "deg");
+        let clamp = gsap.utils.clamp(-3, 3);
+
+        ScrollTrigger.create({
+          onUpdate: (self) => {
+            let skew = clamp(self.getVelocity() / -400);
+            if (Math.abs(skew) > Math.abs(proxy.skew)) {
+              proxy.skew = skew;
+              gsap.to(proxy, {
+                skew: 0,
+                duration: 0.8,
+                ease: "power3",
+                overwrite: true,
+                onUpdate: () => setSkew(proxy.skew)
+              });
+            }
+          }
         });
       });
     }, containerRef); // Scope everything to containerRef!
@@ -190,11 +235,10 @@ export function MobileImageStackGrid({ projects }: { projects: Project[] }) {
             <article
               key={project.title}
               ref={(el) => { itemsRef.current[index] = el; }}
-              className="group relative w-full aspect-[4/5] max-h-[650px] rounded-[2rem] overflow-hidden will-change-transform"
+              className="group relative w-full aspect-[4/5] max-h-[650px] rounded-[2.5rem] overflow-hidden will-change-transform shadow-2xl"
               style={{ 
                 backgroundColor: project.mood.background,
-                boxShadow: `0 30px 60px -20px ${project.mood.background}40, 0 0 40px 0 ${project.mood.accent}15`,
-                // Make opacity 0 initially to avoid FOUC before useLayoutEffect kicks in
+                // Make opacity 0 initially to avoid FOUC
                 opacity: isReady ? 1 : 0, 
                 visibility: isReady ? "visible" : "hidden"
               }}
@@ -206,7 +250,7 @@ export function MobileImageStackGrid({ projects }: { projects: Project[] }) {
               />
               
               {/* Parallax Image */}
-              <div className="absolute inset-0 z-0 overflow-hidden rounded-[2rem]">
+              <div className="absolute inset-0 z-0 overflow-hidden rounded-[2.5rem]">
                 <img
                   src={project.media.image}
                   alt={project.title}
@@ -214,49 +258,50 @@ export function MobileImageStackGrid({ projects }: { projects: Project[] }) {
                 />
               </div>
               
-              {/* Beautiful Scrim / Vignette for text readability */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10 pointer-events-none" />
+              {/* Beautiful Scrim / Vignette */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent z-10 pointer-events-none" />
 
               {/* Floating Glassmorphic Info Card */}
-              <div className="absolute bottom-4 left-4 right-4 z-20">
+              <div className="absolute bottom-6 left-6 right-6 z-20">
                 <div 
-                  className="project-info rounded-[1.5rem] p-6 shadow-2xl transition-transform duration-300 active:scale-[0.98]"
+                  className="project-info rounded-[1.8rem] p-6 shadow-2xl transition-all duration-300 active:scale-[0.98] active:brightness-95"
                   style={{
-                    background: isDark ? "rgba(255,255,255,0.85)" : "rgba(20,20,20,0.85)",
-                    backdropFilter: "blur(24px) saturate(1.6)",
-                    WebkitBackdropFilter: "blur(24px) saturate(1.6)",
-                    border: `1px solid ${borderColor}`
+                    background: isDark ? "rgba(255,255,255,0.9)" : "rgba(15,15,15,0.9)",
+                    backdropFilter: "blur(32px) saturate(1.8)",
+                    WebkitBackdropFilter: "blur(32px) saturate(1.8)",
+                    border: `1px solid ${borderColor}`,
+                    boxShadow: `0 20px 40px -10px rgba(0,0,0,0.5), 0 0 20px 0 ${project.mood.accent}20`
                   }}
                 >
                   {/* Glowing Top Border */}
                   <div 
-                    className="absolute top-0 left-0 w-full h-[2px] rounded-t-[1.5rem] overflow-hidden" 
-                    style={{ background: `linear-gradient(90deg, ${project.mood.accent}, transparent)` }} 
+                    className="absolute top-0 left-0 w-full h-[3px] rounded-t-[1.8rem] overflow-hidden" 
+                    style={{ background: `linear-gradient(90deg, ${project.mood.accent}, transparent, ${project.mood.accent})` }} 
                   />
 
                   {/* Meta Details */}
-                  <div className="flex justify-between items-center mb-4">
-                    <div className="flex flex-wrap gap-1.5">
+                  <div className="flex justify-between items-center mb-5">
+                    <div className="flex flex-wrap gap-2">
                       {project.categories.slice(0, 2).map((cat: string) => (
-                        <span key={cat} className={`px-2.5 py-1 rounded-full font-label text-[8px] uppercase tracking-[0.25em] ${mutedClass} border ${borderColor}`}>
+                        <span key={cat} className={`px-3 py-1 rounded-full font-label text-[9px] uppercase tracking-[0.25em] ${mutedClass} border ${borderColor} backdrop-blur-sm`}>
                           {cat}
                         </span>
                       ))}
                     </div>
-                    <span className={`font-headline font-black text-xl ${mutedClass} opacity-60 tabular-nums`}>
+                    <span className={`font-headline font-black text-2xl ${mutedClass} opacity-40 tabular-nums`}>
                       {String(index + 1).padStart(2, "0")}
                     </span>
                   </div>
 
                   {/* Title */}
-                  <h2 className={`font-headline text-3xl font-black uppercase leading-[0.9] tracking-tight mb-4 ${toneClass}`}>
+                  <h2 className={`font-headline text-[2.25rem] font-black uppercase leading-[0.85] tracking-tight mb-5 ${toneClass}`}>
                     {project.title}
                   </h2>
 
                   {/* Tech Stack Tags */}
-                  <div className="flex flex-wrap gap-1.5 mb-6">
+                  <div className="flex flex-wrap gap-1.5 mb-8">
                     {project.tags.slice(0, 4).map((tag: string) => (
-                      <span key={tag} className={`px-2 py-0.5 font-label text-[8px] uppercase tracking-[0.15em] ${mutedClass} bg-black/5 dark:bg-white/5 rounded-md`}>
+                      <span key={tag} className={`px-2.5 py-1 font-label text-[8px] uppercase tracking-[0.15em] ${mutedClass} bg-black/5 dark:bg-white/5 rounded-lg border ${borderColor}`}>
                         {tag}
                       </span>
                     ))}
@@ -267,15 +312,15 @@ export function MobileImageStackGrid({ projects }: { projects: Project[] }) {
                     href={project.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-full inline-flex justify-center items-center gap-2 rounded-xl px-5 py-4 font-label text-[10px] uppercase tracking-[0.2em] font-bold transition-all hover:opacity-90 active:scale-[0.96]"
+                    className="w-full inline-flex justify-center items-center gap-3 rounded-2xl px-6 py-5 font-label text-[11px] uppercase tracking-[0.25em] font-black transition-all hover:brightness-110 active:scale-[0.96] overflow-hidden group/btn"
                     style={{
                       background: project.mood.accent,
                       color: project.mood.text === "light" ? "#fff" : "#000",
-                      boxShadow: `0 8px 24px ${project.mood.accent}40`
+                      boxShadow: `0 12px 28px ${project.mood.accent}40`
                     }}
                   >
-                    Explore Case Study
-                    <ArrowUpRight size={14} strokeWidth={2.5} />
+                    View Project
+                    <ArrowUpRight size={16} strokeWidth={3} className="transition-transform group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1" />
                   </a>
                 </div>
               </div>
