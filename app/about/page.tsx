@@ -9,34 +9,39 @@ import { gsap } from "@/lib/gsap";
 
 const CAREER_TIMELINE = [
   { 
-    company: "Pixelforge", 
-    role: "Full Stack Developer", 
+    company: "PixelForge", 
+    role: "Co-Founder & Consultant", 
     period: "2023 — Present",
-    description: "Leading architectural decisions and building high-impact digital products for the next generation of the web."
+    description: "Freelance consultancy providing strategic architectural decisions and building high-impact digital products.",
+    url: "https://pixelforge.in/"
   },
   { 
-    company: "Digitaltek", 
-    role: "Software Engineer", 
-    period: "2022 — 2023",
-    description: "Focused on scalable backend systems and modern frontend performance optimization at scale."
+    company: "Digitech", 
+    role: "Full Stack Developer", 
+    period: "Current",
+    description: "Specializing in full-stack engineering and advanced e-commerce development across Shopify, WordPress, and Magento.",
+    url: "https://delhidigitech.com/"
   },
   { 
     company: "The Loom", 
     role: "Full Stack Developer", 
-    period: "2021 — 2022",
-    description: "Crafting editorial digital experiences for premium brands with a focus on motion and interaction."
+    period: "2023 — 2026",
+    description: "Spearheaded backend management and end-to-end full stack development for premium e-commerce experiences.",
+    url: "https://theloom.in/"
   },
   { 
     company: "Commerce Pundit", 
-    role: "Web Developer", 
-    period: "2020 — 2021",
-    description: "Specialized in high-conversion e-commerce solutions and enterprise-grade web applications."
+    role: "Team Lead & Full Stack Developer", 
+    period: "2021 — 2023",
+    description: "Led engineering teams and developed high-conversion enterprise-grade web applications and e-commerce solutions.",
+    url: "https://www.commercepundit.com/"
   },
   { 
     company: "Digital Impression", 
-    role: "Junior Web Developer", 
-    period: "2019 — 2020",
-    description: "Started the journey focusing on interactive web designs and frontend fundamentals."
+    role: "Frontend Web Developer", 
+    period: "2017 — 2021",
+    description: "Focused on frontend engineering and robust e-commerce development using Shopify, WordPress, and Magento.",
+    url: "https://www.thedigitalimpressions.com/"
   },
 ];
 
@@ -211,39 +216,47 @@ export default function AboutPage() {
         </div>
         
         <div className="flex flex-col w-full border-t border-vs-outline/20">
-          {CAREER_TIMELINE.map((item, idx) => (
+          {CAREER_TIMELINE.map((item, idx) => {
+            const Content = (
               <motion.div 
-              key={idx}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-10%" }}
-              transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: idx * 0.1 }}
-              className="group relative border-b border-vs-outline/20 flex flex-col lg:flex-row lg:items-center justify-between py-20 px-6 md:px-12 lg:px-24 hover:bg-vs-foreground hover:text-vs-background transition-colors duration-500 cursor-none"
-            >
-              <div className="flex-1 text-xs md:text-sm font-headline tracking-[0.3em] uppercase opacity-40 group-hover:opacity-100 transition-opacity mb-4 lg:mb-0">
-                {item.period}
-              </div>
-              
-              <motion.div 
-                style={{ skewY: useTransform(scrollYProgress, [0, 1], [0, 2]) }}
-                className="flex-[2] font-display text-7xl md:text-8xl lg:text-[10rem] font-black uppercase tracking-[0.02em] mb-8 lg:mb-0 leading-[0.85]"
+                key={idx}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-10%" }}
+                transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: idx * 0.1 }}
+                className="group relative border-b border-vs-outline/20 flex flex-col lg:flex-row lg:items-center justify-between py-20 px-6 md:px-12 lg:px-24 hover:bg-vs-foreground hover:text-vs-background transition-colors duration-500 cursor-none"
               >
-                {item.company}
-              </motion.div>
-              
-              <div className="flex-1 flex flex-col gap-4 lg:text-right">
-                <span className="font-headline text-xl md:text-3xl uppercase tracking-tighter font-bold text-vs-accent group-hover:text-vs-background transition-colors">{item.role}</span>
-                <p className="text-sm md:text-base opacity-40 group-hover:opacity-80 transition-opacity lg:ml-auto max-w-sm leading-relaxed">
-                  {item.description}
-                </p>
-              </div>
+                <div className="flex-1 text-xs md:text-sm font-headline tracking-[0.3em] uppercase opacity-40 group-hover:opacity-100 transition-opacity mb-4 lg:mb-0">
+                  {item.period}
+                </div>
+                
+                <motion.div 
+                  style={{ skewY: useTransform(scrollYProgress, [0, 1], [0, 2]) }}
+                  className="flex-[2] font-display text-5xl md:text-7xl lg:text-[10rem] font-black uppercase tracking-[0.02em] mb-8 lg:mb-0 leading-[0.85] break-words hyphens-auto"
+                >
+                  {item.company}
+                </motion.div>
+                
+                <div className="flex-1 flex flex-col gap-4 lg:text-right">
+                  <span className="font-headline text-xl md:text-3xl uppercase tracking-tighter font-bold text-vs-accent group-hover:text-vs-background transition-colors">{item.role}</span>
+                  <p className="text-sm md:text-base opacity-40 group-hover:opacity-80 transition-opacity lg:ml-auto max-w-sm leading-relaxed">
+                    {item.description}
+                  </p>
+                </div>
 
-              {/* Hover custom cursor effect placeholder or detail */}
-              <div className="absolute right-12 bottom-12 opacity-0 group-hover:opacity-100 transition-opacity font-mono text-[10px] uppercase tracking-widest hidden lg:block underline">
-                VIEW_DETAILS
-              </div>
-            </motion.div>
-          ))}
+                {/* Hover custom cursor effect placeholder or detail */}
+                <div className="absolute right-12 bottom-12 opacity-0 group-hover:opacity-100 transition-opacity font-mono text-[10px] uppercase tracking-widest hidden lg:block underline">
+                  VIEW_SITE
+                </div>
+              </motion.div>
+            );
+
+            return item.url ? (
+              <a href={item.url} target="_blank" rel="noopener noreferrer" key={idx} className="block cursor-none">
+                {Content}
+              </a>
+            ) : Content;
+          })}
         </div>
       </section>
 
